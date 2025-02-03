@@ -19,34 +19,34 @@ export class AppComponent implements OnInit {
       {
         label: 'Home',
         icon: 'pi pi-home',
-        url: '/home'
+        routerLink: '/home'
 
       },
       {
         label: 'Pictures',
         icon: 'pi pi-star',
-        url: '/pictures'
+        routerLink: '/pictures'
       },
       {
         label: 'Songs',
         icon: 'pi pi-star',
-        url: '/songs'
+        routerLink: '/songs'
       },
       {
         label: 'Videos',
         icon: 'pi pi-star',
-        url: '/videos'
+        routerLink: '/videos'
       },
       {
         label: 'Events',
         icon: 'pi pi-star',
-        url: '/events'
+        routerLink: '/events'
       },
 
       {
         label: 'Contact',
         icon: 'pi pi-envelope',
-        url: '/contact'
+        routerLink: '/contact'
       }
     ]
   }

@@ -1,15 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { MenubarModule } from 'primeng/menubar';
-
+import { Menubar } from 'primeng/menubar';
+import { ButtonModule } from 'primeng/button';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MenubarModule],
+  imports: [RouterOutlet, Menubar, ButtonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'frontend';
 
   items: MenuItem[] | undefined;
@@ -18,47 +18,35 @@ export class AppComponent {
     this.items = [
       {
         label: 'Home',
-        icon: 'pi pi-home'
+        icon: 'pi pi-home',
+        url: '/home'
+
       },
       {
-        label: 'Features',
-        icon: 'pi pi-star'
+        label: 'Pictures',
+        icon: 'pi pi-star',
+        url: '/pictures'
       },
       {
-        label: 'Projects',
-        icon: 'pi pi-search',
-        items: [
-          {
-            label: 'Components',
-            icon: 'pi pi-bolt'
-          },
-          {
-            label: 'Blocks',
-            icon: 'pi pi-server'
-          },
-          {
-            label: 'UI Kit',
-            icon: 'pi pi-pencil'
-          },
-          {
-            label: 'Templates',
-            icon: 'pi pi-palette',
-            items: [
-              {
-                label: 'Apollo',
-                icon: 'pi pi-palette'
-              },
-              {
-                label: 'Ultima',
-                icon: 'pi pi-palette'
-              }
-            ]
-          }
-        ]
+        label: 'Songs',
+        icon: 'pi pi-star',
+        url: '/songs'
       },
+      {
+        label: 'Videos',
+        icon: 'pi pi-star',
+        url: '/videos'
+      },
+      {
+        label: 'Events',
+        icon: 'pi pi-star',
+        url: '/events'
+      },
+
       {
         label: 'Contact',
-        icon: 'pi pi-envelope'
+        icon: 'pi pi-envelope',
+        url: '/contact'
       }
     ]
   }

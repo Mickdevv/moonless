@@ -38,7 +38,7 @@ const featuredItems = computed<FeaturedItem[]>(() => [
     name: 'Logo Tee',
     slug: 'logo-tee',
     price: 25,
-    image: '@/assets/test_image.jpg',
+    image: "@/assets/test_image.jpg",
     tagline: 'Classic logo on ultra-soft cotton.',
   },
   {
@@ -344,28 +344,28 @@ function openExternal(url: string) {
 }
 
 /* RESPONSIVE */
-@media (min-width: 768px) {
-  .landing-page {
-    padding: 2rem 1.5rem 4rem;
-  }
-
-  .hero-content {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .hero-text {
-    flex: 1;
-  }
-
-  .hero-image-wrapper {
-    flex: 1;
-    max-width: 420px;
-    margin-left: auto;
-  }
-
-  .featured-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
+/* @media (min-width: 768px) { */
+/*   .landing-page { */
+/*     padding: 2rem 1.5rem 4rem; */
+/*   } */
+/**/
+/*   .hero-content { */
+/*     flex-direction: row; */
+/*     align-items: center; */
+/*   } */
+/**/
+/*   .hero-text { */
+/*     flex: 1; */
+/*   } */
+/**/
+/*   .hero-image-wrapper { */
+/*     flex: 1; */
+/*     max-width: 420px; */
+/*     margin-left: auto; */
+/*   } */
+/**/
+/*   .featured-grid { */
+/*     grid-template-columns: repeat(3, minmax(0, 1fr)); */
+/*   } */
+/* } */
 </style>

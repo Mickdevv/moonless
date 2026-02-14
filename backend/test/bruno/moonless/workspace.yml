@@ -1,0 +1,14 @@
+opencollection: 1.0.0
+info:
+  name: "moonless"
+  type: workspace
+
+collections:
+  - name: "products"
+    path: "collections/products"
+
+specs:
+
+docs: ''
+
+activeEnvironmentUid: rwxd71000000000000000

@@ -7,6 +7,12 @@ import (
 	"github.com/google/uuid"
 )
 
+func CreateProductImage(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
 func DeleteProductImage(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		imageIdStr := r.PathValue("id")
@@ -28,7 +34,7 @@ func DeleteProductImage(serverCfg *utils.ServerCfg) http.HandlerFunc {
 		res := response{
 			ProductImage: ProductImagePayload{
 				Id:        image.ID,
-				Url:       image.Url,
+				Path:      image.Path,
 				CreatedAt: image.CreatedAt,
 				UpdatedAt: image.UpdatedAt,
 				IsPrimary: image.IsPrimary,
@@ -67,7 +73,7 @@ func GetProductImages(serverCfg *utils.ServerCfg) http.HandlerFunc {
 				Id:        image.ID,
 				UpdatedAt: image.UpdatedAt,
 				CreatedAt: image.CreatedAt,
-				Url:       image.Url,
+				Path:      image.Path,
 				IsPrimary: image.IsPrimary,
 				ProductId: image.ProductID,
 			})

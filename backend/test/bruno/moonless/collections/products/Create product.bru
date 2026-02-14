@@ -1,0 +1,31 @@
+meta {
+  name: Create product
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/products
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "testProduct-{{timestamp}}",
+    "active": true,
+    "description": "Test description",
+    "price": 10,
+    "stock":12,
+    "category":"t-shirts"
+  }
+}
+
+script:pre-request {
+  bru.setGlobalEnvVar("timestamp", Date.now())
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

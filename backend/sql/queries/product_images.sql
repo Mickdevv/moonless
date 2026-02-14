@@ -5,7 +5,7 @@ select * from product_images where product_id = $1;
 select * from product_images where id = $1;
 
 -- name: CreateProductImage :one
-insert into product_images(id, product_id, created_at, updated_at, url, is_primary)
+insert into product_images(id, product_id, created_at, updated_at, path, is_primary)
 values (
   gen_random_UUID(),
   $1,
@@ -14,7 +14,7 @@ values (
   $2,
   $3
   )
-  returning id, product_id, created_at, updated_at, url, is_primary;
+  returning id, product_id, created_at, updated_at, path, is_primary;
 
 -- name: DeleteProductImage :exec
 delete from product_images where id = $1;

@@ -28,7 +28,7 @@ type ProductImage struct {
 	ProductID uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Url       string
+	Path      string
 	IsPrimary bool
 }
 

@@ -12,7 +12,7 @@ import (
 )
 
 const createProductImage = `-- name: CreateProductImage :one
-insert into product_images(id, product_id, created_at, updated_at, url, is_primary)
+insert into product_images(id, product_id, created_at, updated_at, path, is_primary)
 values (
   gen_random_UUID(),
   $1,
@@ -21,24 +21,24 @@ values (
   $2,
   $3
   )
-  returning id, product_id, created_at, updated_at, url, is_primary
+  returning id, product_id, created_at, updated_at, path, is_primary
 `
 
 type CreateProductImageParams struct {
 	ProductID uuid.UUID
-	Url       string
+	Path      string
 	IsPrimary bool
 }
 
 func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImageParams) (ProductImage, error) {
-	row := q.db.QueryRowContext(ctx, createProductImage, arg.ProductID, arg.Url, arg.IsPrimary)
+	row := q.db.QueryRowContext(ctx, createProductImage, arg.ProductID, arg.Path, arg.IsPrimary)
 	var i ProductImage
 	err := row.Scan(
 		&i.ID,
 		&i.ProductID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Url,
+		&i.Path,
 		&i.IsPrimary,
 	)
 	return i, err
@@ -54,7 +54,7 @@ func (q *Queries) DeleteProductImage(ctx context.Context, id uuid.UUID) error {
 }
 
 const getProductImageByImageId = `-- name: GetProductImageByImageId :one
-select id, product_id, created_at, updated_at, url, is_primary from product_images where id = $1
+select id, product_id, created_at, updated_at, path, is_primary from product_images where id = $1
 `
 
 func (q *Queries) GetProductImageByImageId(ctx context.Context, id uuid.UUID) (ProductImage, error) {
@@ -65,14 +65,14 @@ func (q *Queries) GetProductImageByImageId(ctx context.Context, id uuid.UUID) (P
 		&i.ProductID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Url,
+		&i.Path,
 		&i.IsPrimary,
 	)
 	return i, err
 }
 
 const getProductImagesByProductId = `-- name: GetProductImagesByProductId :many
-select id, product_id, created_at, updated_at, url, is_primary from product_images where product_id = $1
+select id, product_id, created_at, updated_at, path, is_primary from product_images where product_id = $1
 `
 
 func (q *Queries) GetProductImagesByProductId(ctx context.Context, productID uuid.UUID) ([]ProductImage, error) {
@@ -89,7 +89,7 @@ func (q *Queries) GetProductImagesByProductId(ctx context.Context, productID uui
 			&i.ProductID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Url,
+			&i.Path,
 			&i.IsPrimary,
 		); err != nil {
 			return nil, err

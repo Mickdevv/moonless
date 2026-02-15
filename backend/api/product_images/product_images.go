@@ -1,15 +1,90 @@
 package productimages
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/Mickdevv/moonless/backend/api/utils"
+	"github.com/Mickdevv/moonless/backend/internal/database"
 	"github.com/google/uuid"
 )
 
 func CreateProductImage(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		data := r.FormValue("data")
+		params := CreateProductImagePayload{}
+		err := json.Unmarshal([]byte(data), &params)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
+			return
+		}
+
+		err = r.ParseMultipartForm(10 << 20)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "File error", err)
+			return
+		}
+
+		file, handler, err := r.FormFile("file")
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "File error", err)
+			return
+		}
+
+		defer file.Close()
+
+		filename := strconv.Itoa(int(time.Now().UnixMilli())) + filepath.Base(handler.Filename)
+
+		destinationPath := filepath.Join(serverCfg.STATIC_FILES_DIR, "images", "products", filename)
+
+		dst, err := os.Create(destinationPath)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "Error saving file", err)
+			return
+		}
+
+		defer dst.Close()
+
+		if _, err := io.Copy(dst, file); err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "Error saving file", err)
+			return
+		}
+
+		uploadedimage, err := serverCfg.DB.CreateProductImage(r.Context(), database.CreateProductImageParams{
+			ProductID: params.ProductId,
+			IsPrimary: params.IsPrimary,
+			Path:      destinationPath,
+		})
+
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "Error saving file", err)
+			return
+		}
+
+		type response struct {
+			Message string              `json:"message"`
+			Data    ProductImagePayload `json:"data"`
+		}
+
+		var res response
+
+		res.Message = "Image uploaded successfully"
+
+		res.Data.Id = uploadedimage.ID
+		res.Data.CreatedAt = uploadedimage.CreatedAt
+		res.Data.UpdatedAt = uploadedimage.UpdatedAt
+		res.Data.ProductId = uploadedimage.ProductID
+		res.Data.Path = uploadedimage.Path
+		res.Data.IsPrimary = uploadedimage.IsPrimary
+
+		utils.RespondWithJson(w, http.StatusOK, res)
 	}
 }
 
@@ -26,6 +101,8 @@ func DeleteProductImage(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			utils.RespondWithError(w, http.StatusNotFound, "Image not found", err)
 			return
 		}
+
+		// err := os.Remove(image.Path)
 
 		type response struct {
 			ProductImage ProductImagePayload `json:"product_image"`

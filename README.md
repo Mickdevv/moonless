@@ -52,13 +52,17 @@ Once done, you should be able to run
 ```bash
 docker-compose up -d
 ```
+Run the database migrations
+```bash 
+godotenv -f .env goose up
+```
 
 Now from your backend directory, run 
 ```bash 
 go run .
 ```
 
-This should start your backend server at http://localhost:8080 (or whatever port you specified)
+This should start your backend server at http://localhost:8080 (or whatever port you specified in your .env file)
 
 ### Frontend
 

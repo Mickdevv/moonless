@@ -6,6 +6,8 @@ info:
 collections:
   - name: "products"
     path: "collections/products"
+  - name: "product-images"
+    path: "collections/product-images"
 
 specs:
 

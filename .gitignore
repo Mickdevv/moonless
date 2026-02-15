@@ -1,4 +1,5 @@
 .env
-static/*
+static/**
 docker-compose.yml
 environments
+

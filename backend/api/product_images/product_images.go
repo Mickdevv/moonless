@@ -2,7 +2,6 @@ package productimages
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -94,6 +93,7 @@ func DeleteProductImage(serverCfg *utils.ServerCfg) http.HandlerFunc {
 		imageId, err := uuid.Parse(imageIdStr)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Invalid image id", err)
+			return
 		}
 
 		image, err := serverCfg.DB.GetProductImageByImageId(r.Context(), imageId)
@@ -128,16 +128,19 @@ func GetProductImages(serverCfg *utils.ServerCfg) http.HandlerFunc {
 		productId, err := uuid.Parse(productIdStr)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Invalid product id", err)
+			return
 		}
 
 		_, err = serverCfg.DB.GetProductById(r.Context(), productId)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusNotFound, "Invalid product id", err)
+			return
 		}
 
 		productImages, err := serverCfg.DB.GetProductImagesByProductId(r.Context(), productId)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Error finding images", err)
+			return
 		}
 
 		type response struct {

@@ -1,0 +1,25 @@
+meta {
+  name: Get all product images
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/product-images/ea62c726-5f87-4b3c-91ba-bcbf83bee9c8
+  body: none
+  auth: inherit
+}
+
+headers {
+  Content-Type: multipart/form-data
+}
+
+body:multipart-form {
+  file: @file(/home/m/Pictures/1605020200050.jpeg)
+  data: {"product_id":"abe8a732-7daf-4b05-83e6-a7c9de67ec98", "is_primary":true}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -3,9 +3,14 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
+import { useProductStore } from '@/stores/products';
+import { p } from 'vue-router/dist/index-CUL6Z3eo.mjs';
 
 // Example: you could pull this from a Pinia store later
 const bandName = 'MOONLESS';
+
+const store = useProductStore()
+store.getProducts()
 
 const router = useRouter();
 
@@ -103,7 +108,13 @@ function openExternal(url: string) {
           <h1 class="hero-title">{{ bandName }}</h1>
           <p class="hero-subtitle">
             New drops, limited runs, and everything you need to rep the band.
+
           </p>
+          <button @click="store.getProducts()">Refresh products</button>
+
+          <p>{{ store.products.length }}</p>
+          <p>{{ store.loading }}</p>
+
           <div class="hero-actions">
             <Button label="Shop Merch" class="p-button-rounded p-button-lg hero-primary-btn" @click="goToShop" />
             <Button label="Listen" class="p-button-text p-button-lg hero-secondary-btn" @click="goToMusic" />

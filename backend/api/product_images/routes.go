@@ -7,7 +7,7 @@ import (
 )
 
 func RegisterRoutes(mux *http.ServeMux, serverCfg *utils.ServerCfg) {
-	mux.HandleFunc("POST /product-images", CreateProductImage(serverCfg))
-	mux.HandleFunc("DELETE /product-images/{id}", DeleteProductImage(serverCfg))
-	mux.HandleFunc("GET /product-images/{id}", GetProductImages(serverCfg))
+	mux.HandleFunc("POST /api/product-images", CreateProductImage(serverCfg))
+	mux.HandleFunc("DELETE /api/product-images/{id}", DeleteProductImage(serverCfg))
+	mux.HandleFunc("GET /api/product-images/{id}", GetProductImages(serverCfg))
 }

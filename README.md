@@ -37,10 +37,6 @@ Change to the backend directory
 ```bash 
 cd backend
 ``` 
-Fetch Go dependencies
-```bash 
-go get
-```
 Install goose and sqlc
 ```bash 
 go install github.com/pressly/goose/v3/cmd/goose@latest

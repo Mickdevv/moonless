@@ -46,6 +46,7 @@ const stockSeverity = (stock) => {
       <Column field="stock" header="Stock">
         <template #body="slotProps">
           <Badge :value="slotProps.data.stock" :severity="stockSeverity(slotProps.data.stock)" />
+          {{ slotProps.data.stock }}
         </template>
       </Column>
       <Column field="" header="">

@@ -51,7 +51,7 @@ function openExternal(url: string) { window.open(url, '_blank', 'noopener,norefe
         <div class="carousel-card" @click="goToProduct(data.id)">
           <div class="">
             <div class="">
-              <img v-if="data.images?.length" :src="'/api/' + data.images[0].Path" :alt="data.name"
+              <img v-if="data.images?.length" :src="'/api/' + data.images[0].path" :alt="data.name"
                 class="carousel-image" />
               <Tag v-if="data.stock !== undefined" :value="`${data.stock} in stock`" :severity="getSeverity(data.stock)"
                 class="stock-tag" />

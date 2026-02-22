@@ -18,13 +18,13 @@ update products set updated_at = NOW(), name = $2, description = $3, category = 
   returning id, created_at, updated_at, active, description, name, category, stock, price;
 
 -- name: GetActiveProducts :many
-select * from products where active = true;
+select id, created_at, updated_at, active, description, name, category, stock, price from products where active = true;
 
 -- name: GetAllProducts :many
-select * from products;
+select id, created_at, updated_at, active, description, name, category, stock, price from products;
 
 -- name: GetProductById :one
-select * from products where id = $1;
+select id, created_at, updated_at, active, description, name, category, stock, price from products where id = $1;
 
 -- name: DeleteProduct :exec
 delete from products where id = $1;

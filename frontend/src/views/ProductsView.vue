@@ -28,6 +28,6 @@ onMounted(() => {
 .products-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: start;
+  justify-content: space-evenly;
 }
 </style>

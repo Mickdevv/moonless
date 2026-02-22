@@ -15,6 +15,6 @@ type ProductImagePayload struct {
 	ProductId uuid.UUID `json:"product_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	Path      string    `json:"Path"`
+	Path      string    `json:"path"`
 	IsPrimary bool      `json:"is_primary"`
 }

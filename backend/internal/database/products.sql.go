@@ -83,18 +83,30 @@ func (q *Queries) DeleteProduct(ctx context.Context, id uuid.UUID) error {
 }
 
 const getActiveProducts = `-- name: GetActiveProducts :many
-select id, created_at, updated_at, active, description, name, category, price, stock from products where active = true
+select id, created_at, updated_at, active, description, name, category, stock, price from products where active = true
 `
 
-func (q *Queries) GetActiveProducts(ctx context.Context) ([]Product, error) {
+type GetActiveProductsRow struct {
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Active      bool
+	Description string
+	Name        string
+	Category    string
+	Stock       int32
+	Price       int32
+}
+
+func (q *Queries) GetActiveProducts(ctx context.Context) ([]GetActiveProductsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getActiveProducts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Product
+	var items []GetActiveProductsRow
 	for rows.Next() {
-		var i Product
+		var i GetActiveProductsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
@@ -103,8 +115,8 @@ func (q *Queries) GetActiveProducts(ctx context.Context) ([]Product, error) {
 			&i.Description,
 			&i.Name,
 			&i.Category,
-			&i.Price,
 			&i.Stock,
+			&i.Price,
 		); err != nil {
 			return nil, err
 		}
@@ -120,18 +132,30 @@ func (q *Queries) GetActiveProducts(ctx context.Context) ([]Product, error) {
 }
 
 const getAllProducts = `-- name: GetAllProducts :many
-select id, created_at, updated_at, active, description, name, category, price, stock from products
+select id, created_at, updated_at, active, description, name, category, stock, price from products
 `
 
-func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
+type GetAllProductsRow struct {
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Active      bool
+	Description string
+	Name        string
+	Category    string
+	Stock       int32
+	Price       int32
+}
+
+func (q *Queries) GetAllProducts(ctx context.Context) ([]GetAllProductsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllProducts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Product
+	var items []GetAllProductsRow
 	for rows.Next() {
-		var i Product
+		var i GetAllProductsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
@@ -140,8 +164,8 @@ func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
 			&i.Description,
 			&i.Name,
 			&i.Category,
-			&i.Price,
 			&i.Stock,
+			&i.Price,
 		); err != nil {
 			return nil, err
 		}
@@ -157,12 +181,24 @@ func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
 }
 
 const getProductById = `-- name: GetProductById :one
-select id, created_at, updated_at, active, description, name, category, price, stock from products where id = $1
+select id, created_at, updated_at, active, description, name, category, stock, price from products where id = $1
 `
 
-func (q *Queries) GetProductById(ctx context.Context, id uuid.UUID) (Product, error) {
+type GetProductByIdRow struct {
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Active      bool
+	Description string
+	Name        string
+	Category    string
+	Stock       int32
+	Price       int32
+}
+
+func (q *Queries) GetProductById(ctx context.Context, id uuid.UUID) (GetProductByIdRow, error) {
 	row := q.db.QueryRowContext(ctx, getProductById, id)
-	var i Product
+	var i GetProductByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
@@ -171,8 +207,8 @@ func (q *Queries) GetProductById(ctx context.Context, id uuid.UUID) (Product, er
 		&i.Description,
 		&i.Name,
 		&i.Category,
-		&i.Price,
 		&i.Stock,
+		&i.Price,
 	)
 	return i, err
 }

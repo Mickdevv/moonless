@@ -2,23 +2,26 @@
 import { onMounted, ref } from 'vue'
 import Card from 'primevue/card';
 
+import 'primeicons/primeicons.css'
+import Button from 'primevue/button'
+
 defineProps(['product'])
 
 </script>
 
 <template>
-  <Card class="product-card">
-    <template #header>
-      <div class="image-wrapper">
-        <img v-if="product.images?.length" :src="'/api/' + product.images[0].Path" :alt="product.name"
-          class="product-image" />
-      </div>
-    </template>
-    <template #title>{{ product.name }}</template>
-    <template #content>
-      <p>{{ product.description }}</p>
-    </template>
-  </Card>
+  <div class="product-card">
+    <div class="image-wrapper">
+      <img v-if="product.images?.length" :src="'/api/' + product.images[0].path" :alt="product.name"
+        class="product-image" />
+    </div>
+    <p>{{ product.description }}</p>
+    <div class="product-card-toolbar">
+
+      <Button severity="danger"><i class="pi pi-shopping-cart"></i></Button>
+      <Button severity="danger"><i class="pi pi-eye"></i></Button>
+    </div>
+  </div>
 </template>
 
 <style>
@@ -36,6 +39,7 @@ defineProps(['product'])
   padding: 0.75rem;
   /* gap from card edges */
   box-sizing: border-box;
+  display: block;
 }
 
 .product-card {
@@ -43,12 +47,12 @@ defineProps(['product'])
   max-width: 25rem;
   padding: 1rem;
   gap: 1rem;
-  border: white;
+  border: 2px solid white;
   border-radius: 2rem;
   border-width: 2px;
   display: flex;
-  background-color: white;
   color: black;
+
   justify-content: center;
   max-height: 200px;
 }

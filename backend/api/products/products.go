@@ -2,7 +2,6 @@ package products
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	productimages "github.com/Mickdevv/moonless/backend/api/product_images"
@@ -44,12 +43,6 @@ func UpdateProduct(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			return
 		}
 
-		product2, err := serverCfg.DB.GetProductById(r.Context(), id)
-		if err != nil {
-			utils.RespondWithError(w, http.StatusInternalServerError, "Error updating product", err)
-			return
-		}
-
 		res := Product{
 			Id:          product.ID,
 			CreatedAt:   product.CreatedAt,
@@ -61,7 +54,6 @@ func UpdateProduct(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			Images:      data.Images,
 			Stock:       int(product.Stock),
 		}
-		fmt.Println(product.Stock, product2.Stock)
 
 		utils.RespondWithJson(w, http.StatusOK, res)
 	}
@@ -100,6 +92,7 @@ func CreateProduct(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			Price:       int(product.Price),
 			Name:        product.Name,
 			Description: product.Description,
+			Stock:       int(product.Stock),
 		}
 
 		utils.RespondWithJson(w, http.StatusOK, res)
@@ -149,6 +142,7 @@ func GetProductById(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			Description: product.Description,
 			Images:      images,
 			Category:    product.Category,
+			Stock:       int(product.Stock),
 		}
 
 		utils.RespondWithJson(w, http.StatusOK, res)
@@ -194,6 +188,7 @@ func GetProducts(serverCfg *utils.ServerCfg) http.HandlerFunc {
 				Description: p.Description,
 				Images:      images,
 				Category:    p.Category,
+				Stock:       int(p.Stock),
 			})
 		}
 

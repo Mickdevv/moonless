@@ -14,7 +14,8 @@ values (
   returning id, created_at, updated_at, active, description, name, category, stock, price;
 
 -- name: UpdateProduct :one
-update products set updated_at = NOW(), name = $2, description = $3, category = $4, stock = $5, price = $6, active = $7 where id = $1 returning *; 
+update products set updated_at = NOW(), name = $2, description = $3, category = $4, stock = $5, price = $6, active = $7 where id = $1 
+  returning id, created_at, updated_at, active, description, name, category, stock, price;
 
 -- name: GetActiveProducts :many
 select * from products where active = true;

@@ -36,8 +36,8 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	fsHandler := http.StripPrefix("/static", http.FileServer(http.Dir(serverConfig.STATIC_FILES_DIR)))
-	mux.Handle("/static/", fsHandler)
+	fsHandler := http.StripPrefix("/api/static", http.FileServer(http.Dir(serverConfig.STATIC_FILES_DIR)))
+	mux.Handle("/api/static/", fsHandler)
 
 	products.RegisterRoutes(mux, &serverConfig)
 	productimages.RegisterRoutes(mux, &serverConfig)

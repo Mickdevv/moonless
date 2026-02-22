@@ -1,79 +1,57 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import Menubar from 'primevue/menubar';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const items = ref([
+  { label: 'Home', command: () => router.push({ name: 'home' }) },
+  { label: 'Shop', command: () => router.push({ name: 'shop' }) },
+  { label: 'Add product', command: () => router.push({ name: 'admin-products-add' }) },
+  { label: 'Products table', command: () => router.push({ name: 'admin-products' }) },
+]);
 </script>
 
 <template>
-  <header>
-  </header>
-  <nav>
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
-    <RouterLink to="/shop">Shop</RouterLink>
-  </nav>
-
-  <RouterView />
+  <div class="layout">
+    <Menubar :model="items" class="centered-menubar" />
+    <div class="page-content">
+      <RouterView />
+    </div>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
+/* Layout wrapper ensures vertical stacking */
+.layout {
+  display: flex;
+  flex-direction: column;
+  /* stack items vertically */
+  align-items: center;
+  /* center everything horizontally */
   width: 100%;
-  font-size: 12px;
-  text-align: center;
+  margin: 0 auto;
+}
+
+/* Menubar width and centering */
+.centered-menubar {
+  width: 100%;
+  /* optional: limit total width */
   margin-top: 2rem;
+  /* spacing from top */
+  justify-content: center;
+  /* center items inside menubar */
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  /* header { */
-  /*   display: flex; */
-  /*   place-items: center; */
-  /*   padding-right: calc(var(--section-gap) / 2); */
-  /* } */
-  /**/
-  /* .logo { */
-  /*   margin: 0 2rem 0 0; */
-  /* } */
-  /**/
-  /* header .wrapper { */
-  /*   display: flex; */
-  /*   place-items: flex-start; */
-  /*   flex-wrap: wrap; */
-  /* } */
-  /**/
-  /* nav { */
-  /*   text-align: left; */
-  /*   margin-left: -1rem; */
-  /*   font-size: 1rem; */
-  /**/
-  /*   padding: 1rem 0; */
-  /*   margin-top: 1rem; */
-  /* } */
+/* Page content wrapper */
+.page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* center content horizontally */
+  width: 100%;
+  margin-top: 2rem;
+  /* spacing below menubar */
 }
 </style>

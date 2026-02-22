@@ -5,11 +5,11 @@ import axios from 'axios'
 
 export const useProductStore = defineStore('products', () => {
   const products = ref<Product[]>([])
+  const currentProduct = ref<Product>()
   const error = ref<string | null>('')
   const loading = ref<boolean>(false)
 
   const getProducts = async () => {
-    console.log('test')
     loading.value = true
     error.value = null
     try {
@@ -22,11 +22,23 @@ export const useProductStore = defineStore('products', () => {
     }
   }
 
+  const getProductById = async (id: string) => {
+    try {
+      loading.value = true
+      const res = await axios.get(`/api/products/${id}`)
+      currentProduct.value = res.data.data
+    } catch (err: any) {
+      error.value = err.message || 'Failed to fetch product'
+    } finally {
+      loading.value = false
+    }
+  }
+
   const createProduct = async (product: Product) => {
     try {
       loading.value = true
       const res = await axios.post('/api/products', product)
-      products.value.push(res.data)
+      products.value.push(res.data.product_images)
     } catch (err: any) {
       error.value = err.message
     } finally {
@@ -58,5 +70,15 @@ export const useProductStore = defineStore('products', () => {
       loading.value = false
     }
   }
-  return { error, loading, products, createProduct, removeProduct, updateProduct, getProducts }
+  return {
+    error,
+    loading,
+    products,
+    createProduct,
+    getProductById,
+    currentProduct,
+    removeProduct,
+    updateProduct,
+    getProducts,
+  }
 })

@@ -15,8 +15,12 @@ headers {
 }
 
 body:multipart-form {
-  file: @file(/home/m/Pictures/1605020200050.jpeg)
-  data: {"product_id":ec52f03d-944f-4930-88fd-62a00b31e606, "is_primary":true}
+  file: @file(/home/m/Pictures/Screenshots/Screenshot_20260221_182342.png)
+  data: {"product_id":"22774850-6878-44df-9fb8-47a380da9db2", "is_primary":true}
+}
+
+script:post-response {
+  bru.setVar("id",res.body.data.id)
 }
 
 settings {

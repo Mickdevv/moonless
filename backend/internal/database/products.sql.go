@@ -178,7 +178,8 @@ func (q *Queries) GetProductById(ctx context.Context, id uuid.UUID) (Product, er
 }
 
 const updateProduct = `-- name: UpdateProduct :one
-update products set updated_at = NOW(), name = $2, description = $3, category = $4, stock = $5, price = $6, active = $7 where id = $1 returning id, created_at, updated_at, active, description, name, category, price, stock
+update products set updated_at = NOW(), name = $2, description = $3, category = $4, stock = $5, price = $6, active = $7 where id = $1 
+  returning id, created_at, updated_at, active, description, name, category, stock, price
 `
 
 type UpdateProductParams struct {
@@ -191,7 +192,19 @@ type UpdateProductParams struct {
 	Active      bool
 }
 
-func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {
+type UpdateProductRow struct {
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Active      bool
+	Description string
+	Name        string
+	Category    string
+	Stock       int32
+	Price       int32
+}
+
+func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (UpdateProductRow, error) {
 	row := q.db.QueryRowContext(ctx, updateProduct,
 		arg.ID,
 		arg.Name,
@@ -201,7 +214,7 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (P
 		arg.Price,
 		arg.Active,
 	)
-	var i Product
+	var i UpdateProductRow
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
@@ -210,8 +223,8 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (P
 		&i.Description,
 		&i.Name,
 		&i.Category,
-		&i.Price,
 		&i.Stock,
+		&i.Price,
 	)
 	return i, err
 }

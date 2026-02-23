@@ -17,9 +17,8 @@ onMounted(() => {
 
 // Carousel responsiveness for different screen sizes
 const responsiveOptions = ref([
-  { breakpoint: '1400px', numVisible: 4, numScroll: 1 },
-  { breakpoint: '1199px', numVisible: 3, numScroll: 1 },
-  { breakpoint: '767px', numVisible: 2, numScroll: 1 },
+  { breakpoint: '1199px', numVisible: 3, numScroll: 3 },
+  { breakpoint: '767px', numVisible: 2, numScroll: 2 },
   { breakpoint: '575px', numVisible: 1, numScroll: 1 }
 ]);
 
@@ -35,7 +34,7 @@ function goToShop() { router.push({ name: 'shop' }); }
 function goToMusic() { router.push({ name: 'music' }); }
 function goToProduct(slug: string) { router.push({ name: 'product', params: { slug } }); }
 function openExternal(url: string) { window.open(url, '_blank', 'noopener,noreferrer'); }
-function formatPrice(amount: number) { return `$${amount.toFixed(2)}`; }
+// function formatPrice(amount: number) { return `$${amount.toFixed(2)}`; }
 </script>
 
 <template>
@@ -72,7 +71,7 @@ function formatPrice(amount: number) { return `$${amount.toFixed(2)}`; }
         <div v-else-if="store.products.length === 0" class="p-6 text-center">No products available.</div>
 
         <!-- Carousel -->
-        <Carousel v-else :value="store.products" :numVisible="4" :numScroll="1" :responsiveOptions="responsiveOptions"
+        <Carousel v-else :value="store.products" :numVisible="3" :numScroll="3" :responsiveOptions="responsiveOptions"
           :circular="true" :autoplayInterval="5000" class="product-carousel">
           <template #item="{ data }">
             <Card class="carousel-card" @click="goToProduct(data.slug)">
@@ -84,7 +83,7 @@ function formatPrice(amount: number) { return `$${amount.toFixed(2)}`; }
               </div>
               <div class="product-info">
                 <h3 class="product-name">{{ data.name }}</h3>
-                <p class="product-price">{{ formatPrice(data.price) }}</p>
+                <p class="product-price">{{ data.price.toFixed(2) }}&euro;</p>
               </div>
             </Card>
           </template>

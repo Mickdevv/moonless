@@ -55,7 +55,6 @@ function onFormSubmit() {
 //   });
 // };
 function deleteImage() {
-
 }
 </script>
 

@@ -6,7 +6,6 @@ import Card from 'primevue/card';
 import Carousel from 'primevue/carousel';
 import { Tag } from 'primevue';
 import { useProductStore } from '@/stores/products';
-import { formatPrice } from '@/utils/fomattimg';
 
 const bandName = 'MOONLESS';
 const productStore = useProductStore();
@@ -18,10 +17,9 @@ onMounted(() => {
 
 // Carousel responsiveness for different screen sizes
 const responsiveOptions = ref([
-  { breakpoint: '1400px', numVisible: 4, numScroll: 1 },
-  { breakpoint: '1199px', numVisible: 3, numScroll: 1 },
-  { breakpoint: '767px', numVisible: 2, numScroll: 1 },
-  { breakpoint: '575px', numVisible: 1, numScroll: 1 }
+  { breakpoint: '1399px', numVisible: 3, numScroll: 3 },
+  { breakpoint: '1000px', numVisible: 2, numScroll: 2 },
+  { breakpoint: '700px', numVisible: 1, numScroll: 1 }
 ]);
 
 // Severity color for stock
@@ -59,9 +57,9 @@ function openExternal(url: string) { window.open(url, '_blank', 'noopener,norefe
           </div>
           <div class="mb-4 font-medium">{{ data.name }}</div>
           <div class="">
-            <p class="product-price">{{ formatPrice(data.price) }}</p>
+            <p class="product-price">{{ data.price.toFixed(2) }}</p>
             <span>
-              <Button icon="pi pi-heart" severity="secondary" variant="outlined" />
+              <Button icon="pi pi-eye" severity="secondary" variant="outlined" />
               <Button icon="pi pi-shopping-cart" class="ml-2" />
             </span>
           </div>

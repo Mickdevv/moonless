@@ -15,7 +15,7 @@ type Product struct {
 	Description string                              `json:"description"`
 	Name        string                              `json:"name"`
 	Category    string                              `json:"category"`
-	Price       int                                 `json:"price"`
+	Price       float32                             `json:"price"`
 	Stock       int                                 `json:"stock"`
 	Images      []productimages.ProductImagePayload `json:"images"`
 }
@@ -25,7 +25,7 @@ type UpdateProductPayload struct {
 	Description string                              `json:"description"`
 	Name        string                              `json:"name"`
 	Category    string                              `json:"category"`
-	Price       int                                 `json:"price"`
+	Price       float64                             `json:"price"`
 	Stock       int                                 `json:"stock"`
 	Images      []productimages.ProductImagePayload `json:"images"`
 }

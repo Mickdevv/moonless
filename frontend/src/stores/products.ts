@@ -2,12 +2,45 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import type { Product } from '@/types/types/product'
 import axios from 'axios'
+import type { ProductImage } from '@/types/types/product-image'
 
 export const useProductStore = defineStore('products', () => {
   const products = ref<Product[]>([])
   const currentProduct = ref<Product>()
   const error = ref<string | null>('')
   const loading = ref<boolean>(false)
+
+  const createProductImage = async (image: File, productId: string, productImage: ProductImage) => {
+    loading.value = true
+    error.value = null
+    try {
+      const res = await axios.post('/api/product-images', productImage)
+      const product = products.value.find((p) => p.id == productId)
+      if (product) {
+        product.images.push(res.data)
+      }
+    } catch (err: any) {
+      error.value = err.message || 'Failed to create product image'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const deleteProductimage = async (productId: string, productImageId: string) => {
+    loading.value = true
+    error.value = null
+    try {
+      const res = await axios.delete(`/api/product-images/${productImageId}`)
+      const product = products.value.find((p) => p.id == productId)
+      if (product) {
+        product.images = product.images.filter((i) => i.id != productImageId)
+      }
+    } catch (err: any) {
+      error.value = err.message || 'Failed to delete product image'
+    } finally {
+      loading.value = false
+    }
+  }
 
   const getProducts = async () => {
     loading.value = true
@@ -80,5 +113,7 @@ export const useProductStore = defineStore('products', () => {
     removeProduct,
     updateProduct,
     getProducts,
+    deleteProductimage,
+    createProductImage,
   }
 })

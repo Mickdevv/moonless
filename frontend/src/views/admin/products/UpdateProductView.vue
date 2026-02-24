@@ -13,6 +13,8 @@ import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import 'primeicons/primeicons.css'
+import { ref } from 'vue'
+import type { CreateProductImageDto } from '@/types/DTOs/CreateProductImage.dto'
 
 
 const route = useRoute()
@@ -20,6 +22,7 @@ const productStore = useProductStore()
 
 const confirm = useConfirm();
 const toast = useToast();
+
 
 const confirm1 = (event: any) => {
   confirm.require({
@@ -35,11 +38,11 @@ const confirm1 = (event: any) => {
       label: 'Save'
     },
     accept: () => {
-      onFormSubmit()
+      updateProductSubmit()
     },
   });
 };
-const confirmMakePrimary = (event: any) => {
+const confirmMakePrimary = (event: any, imageId: string) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Are you sure you want to proceed?',
@@ -53,11 +56,11 @@ const confirmMakePrimary = (event: any) => {
       label: 'Save'
     },
     accept: () => {
-      onFormSubmit()
+      updateProductSubmit()
     },
   });
 };
-const confirmDeleteProductImage = (event: any) => {
+const confirmDeleteProductImage = (event: any, imageId: string) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Confirm',
@@ -71,7 +74,7 @@ const confirmDeleteProductImage = (event: any) => {
       label: 'Save'
     },
     accept: () => {
-      onFormSubmit()
+      productStore.deleteProductimage(productStore.currentProduct!.id, imageId)
     },
   });
 };
@@ -106,13 +109,23 @@ onMounted(() => {
   }
 })
 
-function onFormSubmit() {
+function updateProductSubmit() {
   if (productStore.currentProduct) {
     productStore.updateProduct(productStore.currentProduct)
   }
 }
-function deleteImage() {
+const file = ref(null)
+function onFileSelect(event: any) {
+  file.value = event.target.files[0]
 }
+const productImage = ref<CreateProductImageDto>()
+function productImageSubmit() {
+  if (file.value && productStore.currentProduct) {
+    productStore.createProductImage(file.value, productStore.currentProduct?.id)
+  }
+}
+
+
 </script>
 
 <template>
@@ -171,19 +184,25 @@ function deleteImage() {
       Loading product...
     </div>
 
-    <div v-if="productStore.currentProduct?.images.length" class="product-images-container">
+    <div class="product-images-container">
       <h2>Product Images</h2>
-      <div class="image-card" v-for="image in productStore.currentProduct?.images">
-        <div>
-          <img style="border-radius: 10px;" :src="`/api/${image.path}`" :alt="image.id">
-        </div>
-        <div class="image-control-panel">
-          <Button @click="confirmMakePrimary($event, image.id)" :v-if="!image.is_primary" severity="info">Make
-            primary</Button>
-          <Button severity="danger" @click="confirmDeleteProductImage($event, image.id)"><i
-              class="pi pi-trash"></i></Button>
-          <ConfirmPopup></ConfirmPopup>
-          <!-- <Button @click="confirmPosition('top')" severity="danger"><i class="pi pi-trash"></i></Button> -->
+      <div>
+        <input type="file" @change="onFileSelect" accept="image/*" />
+        <Button label="Upload" @click="productImageSubmit()" />
+      </div>
+      <div v-if="productStore.currentProduct?.images">
+
+        <div class="image-card" v-for="image in productStore.currentProduct?.images">
+          <div>
+            <img style="border-radius: 10px;" :src="`/api/${image.path}`" :alt="image.id">
+          </div>
+          <div class="image-control-panel">
+            <Button @click="confirmMakePrimary($event, image.id)" :v-if="!image.is_primary" severity="info">Make
+              primary</Button>
+            <Button severity="danger" @click="confirmDeleteProductImage($event, image.id)"><i
+                class="pi pi-trash"></i></Button>
+            <ConfirmPopup></ConfirmPopup>
+          </div>
         </div>
       </div>
     </div>

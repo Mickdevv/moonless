@@ -4,6 +4,7 @@ import type { Product } from '@/types/types/product'
 import axios from 'axios'
 import type { ProductImage } from '@/types/types/product-image'
 import { useToast } from 'primevue/usetoast'
+import type { CreateProductImageDto } from '@/types/DTOs/CreateProductImage.dto'
 
 export const useProductStore = defineStore('products', () => {
   const toast = useToast()
@@ -12,14 +13,20 @@ export const useProductStore = defineStore('products', () => {
   const error = ref<string | null>('')
   const loading = ref<boolean>(false)
 
-  const createProductImage = async (image: File, productId: string, productImage: ProductImage) => {
+  const createProductImage = async (image: File, productId: string) => {
     loading.value = true
     error.value = null
     try {
-      const res = await axios.post('/api/product-images', productImage)
+      const formData = new FormData()
+      formData.append('file', image)
+      formData.append('data', JSON.stringify({ product_id: productId, is_primary: false }))
+      const res = await axios.post('/api/product-images', formData)
       const product = products.value.find((p) => p.id == productId)
       if (product) {
-        product.images.push(res.data)
+        product.images.push(res.data.data)
+      }
+      if (currentProduct.value) {
+        currentProduct.value.images.push(res.data.data)
       }
     } catch (err: any) {
       error.value = err.message || 'Failed to create product image'
@@ -35,7 +42,12 @@ export const useProductStore = defineStore('products', () => {
       const res = await axios.delete(`/api/product-images/${productImageId}`)
       const product = products.value.find((p) => p.id == productId)
       if (product) {
-        product.images = product.images.filter((i) => i.id != productImageId)
+        product.images = product.images.filter((i) => i.id != res.data.product_image.id)
+      }
+      if (currentProduct.value) {
+        currentProduct.value.images = currentProduct.value.images.filter(
+          (i) => i.id != res.data.product_image.id,
+        )
       }
     } catch (err: any) {
       error.value = err.message || 'Failed to delete product image'

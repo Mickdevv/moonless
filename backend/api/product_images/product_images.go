@@ -102,6 +102,12 @@ func DeleteProductImage(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			return
 		}
 
+		err = serverCfg.DB.DeleteProductImage(r.Context(), imageId)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "An error occurred while deleting the image", err)
+			return
+		}
+
 		// err := os.Remove(image.Path)
 
 		type response struct {

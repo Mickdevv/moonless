@@ -3,8 +3,10 @@ import { defineStore } from 'pinia'
 import type { Product } from '@/types/types/product'
 import axios from 'axios'
 import type { ProductImage } from '@/types/types/product-image'
+import { useToast } from 'primevue/usetoast'
 
 export const useProductStore = defineStore('products', () => {
+  const toast = useToast()
   const products = ref<Product[]>([])
   const currentProduct = ref<Product>()
   const error = ref<string | null>('')
@@ -97,6 +99,12 @@ export const useProductStore = defineStore('products', () => {
 
       products.value = products.value.filter((p) => p.id != res.data.id)
       products.value.push(res.data)
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'You have accepted21',
+        life: 3000,
+      })
     } catch (err: any) {
       error.value = err.message
     } finally {

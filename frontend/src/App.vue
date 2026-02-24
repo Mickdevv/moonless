@@ -2,8 +2,11 @@
 import Menubar from 'primevue/menubar';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
 const router = useRouter();
+const toast = useToast();
 
 const items = ref([
   { label: 'Home', command: () => router.push({ name: 'home' }) },
@@ -18,6 +21,7 @@ const items = ref([
     <Menubar :model="items" class="centered-menubar" />
     <div class="page-content">
       <RouterView />
+      <Toast />
     </div>
   </div>
 </template>

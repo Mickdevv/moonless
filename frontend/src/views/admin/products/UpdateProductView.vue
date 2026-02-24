@@ -7,16 +7,97 @@ import InputNumber from 'primevue/inputnumber'
 import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
-import ConfirmDialog from 'primevue/confirmdialog'
+import ConfirmPopup from 'primevue/confirmpopup';
+
+
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import 'primeicons/primeicons.css'
-import Card from 'primevue/card';
 
 
 const route = useRoute()
 const productStore = useProductStore()
 
+const confirm = useConfirm();
+const toast = useToast();
+
+const confirm1 = (event: any) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Save'
+    },
+    accept: () => {
+      onFormSubmit()
+    },
+  });
+};
+const confirmMakePrimary = (event: any) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Save'
+    },
+    accept: () => {
+      onFormSubmit()
+    },
+  });
+};
+const confirmDeleteProductImage = (event: any) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Confirm',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Save'
+    },
+    accept: () => {
+      onFormSubmit()
+    },
+  });
+};
+
+const confirm2 = (event: any) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Do you want to delete this record?',
+    icon: 'pi pi-info-circle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Delete',
+      severity: 'danger'
+    },
+    accept: () => {
+      toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+    },
+    reject: () => {
+      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+    }
+  });
+};
 
 onMounted(() => {
   const id = route.params.id as string
@@ -30,30 +111,6 @@ function onFormSubmit() {
     productStore.updateProduct(productStore.currentProduct)
   }
 }
-// const confirmPosition = (position: string) => {
-//   confirm.require({
-//     group: 'positioned',
-//     message: 'Are you sure you want to proceed?',
-//     header: 'Confirmation',
-//     icon: 'pi pi-info-circle',
-//     position: position,
-//     rejectProps: {
-//       label: 'Cancel',
-//       severity: 'secondary',
-//       text: true
-//     },
-//     acceptProps: {
-//       label: 'Confirm',
-//       text: true
-//     },
-//     accept: () => {
-//       toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Request submitted', life: 3000 });
-//     },
-//     reject: () => {
-//       toast.add({ severity: 'error', summary: 'Rejected', detail: 'Process incomplete', life: 3000 });
-//     }
-//   });
-// };
 function deleteImage() {
 }
 </script>
@@ -63,7 +120,9 @@ function deleteImage() {
     <div v-if="productStore.currentProduct" class="form-container">
       <h2>Edit Product</h2>
 
-      <form @submit.prevent="onFormSubmit" class="flex flex-col gap-4">
+      <!-- <form @submit.prevent="confirm1" class="flex flex-col gap-4"> -->
+
+      <form @submit.prevent="confirm1" class="flex flex-col gap-4">
 
         <!-- Name -->
         <div class="field">
@@ -102,8 +161,8 @@ function deleteImage() {
           <Checkbox v-model="productStore.currentProduct.active" :binary="true" />
         </div>
 
-        <Button type="submit" label="Update Product" severity="secondary" />
-
+        <Button type="submit" label="Update Product" severity="secondary" @click="confirm1($event)" />
+        <ConfirmPopup></ConfirmPopup>
       </form>
 
     </div>
@@ -119,8 +178,11 @@ function deleteImage() {
           <img style="border-radius: 10px;" :src="`/api/${image.path}`" :alt="image.id">
         </div>
         <div class="image-control-panel">
-          <Button :v-if="!image.is_primary" severity="info">Make primary</Button>
-          <Button severity="danger"><i class="pi pi-trash"></i></Button>
+          <Button @click="confirmMakePrimary($event, image.id)" :v-if="!image.is_primary" severity="info">Make
+            primary</Button>
+          <Button severity="danger" @click="confirmDeleteProductImage($event, image.id)"><i
+              class="pi pi-trash"></i></Button>
+          <ConfirmPopup></ConfirmPopup>
           <!-- <Button @click="confirmPosition('top')" severity="danger"><i class="pi pi-trash"></i></Button> -->
         </div>
       </div>
@@ -168,6 +230,6 @@ Button {
 
 h2 {
   width: 100%;
-  padding: 2rem;
+  padding-bottom: 2rem;
 }
 </style>

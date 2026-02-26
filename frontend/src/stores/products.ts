@@ -35,13 +35,33 @@ export const useProductStore = defineStore('products', () => {
       const res = await axios.post('/api/product-images', formData)
       const product = products.value.find((p) => p.id == productId)
       if (product) {
-        product.images.push(res.data.data)
+        if (product.images == null) {
+          product.images = [res.data.data]
+        } else {
+          product.images.push(res.data.data)
+        }
       }
       if (currentProduct.value) {
-        currentProduct.value.images.push(res.data.data)
+        if (currentProduct.value.images == null) {
+          currentProduct.value.images = [res.data.data]
+        } else {
+          currentProduct.value.images.push(res.data.data)
+        }
       }
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'Product image created',
+        life: 3000,
+      })
     } catch (err: any) {
       error.value = err.message || 'Failed to create product image'
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }
@@ -76,8 +96,20 @@ export const useProductStore = defineStore('products', () => {
           }
         })
       }
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'Product image updated',
+        life: 3000,
+      })
     } catch (err: any) {
       error.value = err.message || 'Failed to update product image'
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }
@@ -96,8 +128,20 @@ export const useProductStore = defineStore('products', () => {
           (i) => i.id != res.data.product_image.id,
         )
       }
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'Product image deleted',
+        life: 3000,
+      })
     } catch (err: any) {
       error.value = err.message || 'Failed to delete product image'
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }
@@ -111,6 +155,12 @@ export const useProductStore = defineStore('products', () => {
       products.value = res.data.products
     } catch (err: any) {
       error.value = err.message || 'Failed to fetch products'
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }
@@ -123,6 +173,12 @@ export const useProductStore = defineStore('products', () => {
       currentProduct.value = res.data.data
     } catch (err: any) {
       error.value = err.message || 'Failed to fetch product'
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }
@@ -134,8 +190,20 @@ export const useProductStore = defineStore('products', () => {
       const res = await axios.post('/api/products', product)
       products.value.push(res.data.product_images)
       await router.push(`/admin/products/${res.data.id}`)
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'Product created',
+        life: 3000,
+      })
     } catch (err: any) {
       error.value = err.message
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }
@@ -145,8 +213,20 @@ export const useProductStore = defineStore('products', () => {
       loading.value = true
       const res = await axios.delete(`/api/products/${id}`)
       products.value = products.value.filter((p) => p.id != id)
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'Product deleted',
+        life: 3000,
+      })
     } catch (err: any) {
       error.value = err.message
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }
@@ -158,6 +238,12 @@ export const useProductStore = defineStore('products', () => {
       currentProduct.value = structuredClone(blankProduct)
     } catch (err: any) {
       error.value = err.message
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }
@@ -172,11 +258,17 @@ export const useProductStore = defineStore('products', () => {
       toast.add({
         severity: 'success',
         summary: 'Confirmed',
-        detail: 'You have accepted21',
+        detail: 'Product updated',
         life: 3000,
       })
     } catch (err: any) {
       error.value = err.message
+      toast.add({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'An error occurred',
+        life: 3000,
+      })
     } finally {
       loading.value = false
     }

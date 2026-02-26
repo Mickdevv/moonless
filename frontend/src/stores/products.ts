@@ -35,6 +35,26 @@ export const useProductStore = defineStore('products', () => {
     }
   }
 
+  const makeProductImagePrimary = async (productId: string, productImageId: string) => {
+    loading.value = true
+    error.value = null
+    try {
+      const res = await axios.delete(`/api/product-images/${productImageId}`)
+      const product = products.value.find((p) => p.id == productId)
+      if (product) {
+        product.images = product.images.filter((i) => i.id != res.data.product_image.id)
+      }
+      if (currentProduct.value) {
+        currentProduct.value.images = currentProduct.value.images.filter(
+          (i) => i.id != res.data.product_image.id,
+        )
+      }
+    } catch (err: any) {
+      error.value = err.message || 'Failed to delete product image'
+    } finally {
+      loading.value = false
+    }
+  }
   const deleteProductimage = async (productId: string, productImageId: string) => {
     loading.value = true
     error.value = null

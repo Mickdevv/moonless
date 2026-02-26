@@ -56,7 +56,7 @@ const confirmMakePrimary = (event: any, imageId: string) => {
       label: 'Save'
     },
     accept: () => {
-      updateProductSubmit()
+      productStore.makeProductImagePrimary(imageId)
     },
   });
 };
@@ -191,7 +191,6 @@ function productImageSubmit() {
         <Button label="Upload" @click="productImageSubmit()" />
       </div>
       <div v-if="productStore.currentProduct?.images">
-
         <div class="image-card" v-for="image in productStore.currentProduct?.images">
           <div>
             <img style="border-radius: 10px;" :src="`/api/${image.path}`" :alt="image.id">

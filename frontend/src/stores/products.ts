@@ -5,13 +5,25 @@ import axios from 'axios'
 import type { ProductImage } from '@/types/types/product-image'
 import { useToast } from 'primevue/usetoast'
 import type { CreateProductImageDto } from '@/types/DTOs/CreateProductImage.dto'
+import { useRouter } from 'vue-router'
 
 export const useProductStore = defineStore('products', () => {
+  const router = useRouter()
   const toast = useToast()
   const products = ref<Product[]>([])
   const currentProduct = ref<Product>()
   const error = ref<string | null>('')
   const loading = ref<boolean>(false)
+  const blankProduct: Product = {
+    id: '',
+    name: '',
+    category: '',
+    active: false,
+    price: 0,
+    stock: 0,
+    images: [],
+    description: '',
+  }
 
   const createProductImage = async (image: File, productId: string) => {
     loading.value = true
@@ -39,18 +51,33 @@ export const useProductStore = defineStore('products', () => {
     loading.value = true
     error.value = null
     try {
-      const res = await axios.delete(`/api/product-images/${productImageId}`)
+      const res = await axios.put(`/api/product-images/${productImageId}`)
+      if (currentProduct.value) {
+        currentProduct.value.images = currentProduct.value.images.map((pi) => {
+          if (pi.id == productImageId) {
+            pi.is_primary = true
+            return pi
+          } else {
+            pi.is_primary = false
+            return pi
+          }
+        })
+      }
+
       const product = products.value.find((p) => p.id == productId)
       if (product) {
-        product.images = product.images.filter((i) => i.id != res.data.product_image.id)
-      }
-      if (currentProduct.value) {
-        currentProduct.value.images = currentProduct.value.images.filter(
-          (i) => i.id != res.data.product_image.id,
-        )
+        product.images = product.images.map((pi) => {
+          if (pi.id == productImageId) {
+            pi.is_primary = true
+            return pi
+          } else {
+            pi.is_primary = false
+            return pi
+          }
+        })
       }
     } catch (err: any) {
-      error.value = err.message || 'Failed to delete product image'
+      error.value = err.message || 'Failed to update product image'
     } finally {
       loading.value = false
     }
@@ -106,17 +133,18 @@ export const useProductStore = defineStore('products', () => {
       loading.value = true
       const res = await axios.post('/api/products', product)
       products.value.push(res.data.product_images)
+      await router.push(`/admin/products/${res.data.id}`)
     } catch (err: any) {
       error.value = err.message
     } finally {
       loading.value = false
     }
   }
-  const removeProduct = async (id: string) => {
+  const deleteProduct = async (id: string) => {
     try {
       loading.value = true
       const res = await axios.delete(`/api/products/${id}`)
-      products.value = products.value.filter((p) => p.id != res.data.id)
+      products.value = products.value.filter((p) => p.id != id)
     } catch (err: any) {
       error.value = err.message
     } finally {
@@ -124,6 +152,16 @@ export const useProductStore = defineStore('products', () => {
     }
   }
 
+  const resetCurrentProduct = () => {
+    try {
+      loading.value = true
+      currentProduct.value = structuredClone(blankProduct)
+    } catch (err: any) {
+      error.value = err.message
+    } finally {
+      loading.value = false
+    }
+  }
   const updateProduct = async (product: Product) => {
     try {
       loading.value = true
@@ -150,10 +188,12 @@ export const useProductStore = defineStore('products', () => {
     createProduct,
     getProductById,
     currentProduct,
-    removeProduct,
+    deleteProduct,
     updateProduct,
     getProducts,
     deleteProductimage,
     createProductImage,
+    makeProductImagePrimary,
+    resetCurrentProduct,
   }
 })

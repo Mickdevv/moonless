@@ -30,10 +30,10 @@ type UpdateProductPayload struct {
 	Images      []productimages.ProductImagePayload `json:"images"`
 }
 type CreateProductPayload struct {
-	Active      bool   `json:"active"`
-	Description string `json:"description"`
-	Name        string `json:"name"`
-	Category    string `json:"category"`
-	Price       int    `json:"price"`
-	Stock       int    `json:"stock"`
+	Active      bool    `json:"active"`
+	Description string  `json:"description"`
+	Name        string  `json:"name"`
+	Category    string  `json:"category"`
+	Price       float64 `json:"price"`
+	Stock       int     `json:"stock"`
 }

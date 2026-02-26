@@ -10,6 +10,7 @@ func RegisterRoutes(mux *http.ServeMux, serverCfg *utils.ServerCfg) {
 	mux.HandleFunc("GET /api/products", GetProducts(serverCfg))
 	mux.HandleFunc("GET /api/products/{id}", GetProductById(serverCfg))
 	mux.HandleFunc("POST /api/products", CreateProduct(serverCfg))
+	mux.HandleFunc("DELETE /api/products/{id}", DeleteProduct(serverCfg))
 	mux.HandleFunc("PUT /api/products/{id}", UpdateProduct(serverCfg))
 
 }

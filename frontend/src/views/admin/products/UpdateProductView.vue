@@ -42,7 +42,7 @@ const confirm1 = (event: any) => {
     },
   });
 };
-const confirmMakePrimary = (event: any, imageId: string) => {
+const confirmMakePrimary = (event: any, productId: string, imageId: string) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Are you sure you want to proceed?',
@@ -56,7 +56,7 @@ const confirmMakePrimary = (event: any, imageId: string) => {
       label: 'Save'
     },
     accept: () => {
-      productStore.makeProductImagePrimary(imageId)
+      productStore.makeProductImagePrimary(productId, imageId)
     },
   });
 };
@@ -196,9 +196,10 @@ function productImageSubmit() {
             <img style="border-radius: 10px;" :src="`/api/${image.path}`" :alt="image.id">
           </div>
           <div class="image-control-panel">
-            <Button @click="confirmMakePrimary($event, image.id)" :v-if="!image.is_primary" severity="info">Make
+            <Button @click="confirmMakePrimary($event, productStore.currentProduct.id, image.id)"
+              v-if="!image.is_primary" severity="info">Make
               primary</Button>
-            <Button severity="danger" @click="confirmDeleteProductImage($event, image.id)"><i
+            <Button severity="danger" v-if="!image.is_primary" @click="confirmDeleteProductImage($event, image.id)"><i
                 class="pi pi-trash"></i></Button>
             <ConfirmPopup></ConfirmPopup>
           </div>

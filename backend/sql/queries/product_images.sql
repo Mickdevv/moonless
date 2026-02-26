@@ -18,3 +18,7 @@ values (
 
 -- name: DeleteProductImage :exec
 delete from product_images where id = $1;
+
+-- name: UpdateProductImage :exec
+update product_images set updated_at = NOW(), is_primary = $2 where id = $1;
+

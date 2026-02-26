@@ -14,6 +14,52 @@ import (
 	"github.com/google/uuid"
 )
 
+func MakeProductImagePrimary(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Invalid image id", err)
+			return
+		}
+
+		productImageDetails, err := serverCfg.DB.GetProductImageByImageId(r.Context(), id)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Image not found", err)
+			return
+		}
+
+		siblingImages, err := serverCfg.DB.GetProductImagesByProductId(r.Context(), productImageDetails.ProductID)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Associated product not found", err)
+			return
+		}
+
+		for _, image := range siblingImages {
+			err = serverCfg.DB.UpdateProductImage(r.Context(), database.UpdateProductImageParams{
+				ID:        image.ID,
+				IsPrimary: false,
+			})
+		}
+
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "Error updating one or more of the images", err)
+			return
+		}
+		err = serverCfg.DB.UpdateProductImage(r.Context(), database.UpdateProductImageParams{
+			ID:        id,
+			IsPrimary: true,
+		})
+
+		type response struct {
+			ID uuid.UUID `json:"id"`
+		}
+
+		utils.RespondWithJson(w, http.StatusOK, response{ID: id})
+
+	}
+}
+
 func CreateProductImage(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 

@@ -99,6 +99,23 @@ func CreateProduct(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	}
 }
 
+func DeleteProduct(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idString := r.PathValue("id")
+		id, err := uuid.Parse(idString)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Invalid id", err)
+		}
+		err = serverCfg.DB.DeleteProduct(r.Context(), id)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Product not found", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+
+	}
+}
 func GetProductById(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idString := r.PathValue("id")

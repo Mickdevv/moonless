@@ -104,3 +104,17 @@ func (q *Queries) GetProductImagesByProductId(ctx context.Context, productID uui
 	}
 	return items, nil
 }
+
+const updateProductImage = `-- name: UpdateProductImage :exec
+update product_images set updated_at = NOW(), is_primary = $2 where id = $1
+`
+
+type UpdateProductImageParams struct {
+	ID        uuid.UUID
+	IsPrimary bool
+}
+
+func (q *Queries) UpdateProductImage(ctx context.Context, arg UpdateProductImageParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductImage, arg.ID, arg.IsPrimary)
+	return err
+}

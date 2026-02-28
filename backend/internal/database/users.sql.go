@@ -14,7 +14,7 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-insert into users(id, created_at, updated_at, email, email_verified_at, password, deactivated_at)
+insert into users(id, created_at, updated_at, email, email_verified_at, password, deactivated_at, role)
 values(
   gen_random_UUID(),
   NOW(),
@@ -22,14 +22,16 @@ values(
   $1,
   NULL,
   $2,
-  NULL
+  NULL,
+  $3
   )
-  returning id, created_at, updated_at, email, email_verified_at, deactivated_at
+  returning id, created_at, updated_at, email, email_verified_at, deactivated_at, role
 `
 
 type CreateUserParams struct {
 	Email    string
 	Password string
+	Role     string
 }
 
 type CreateUserRow struct {
@@ -39,10 +41,11 @@ type CreateUserRow struct {
 	Email           string
 	EmailVerifiedAt sql.NullTime
 	DeactivatedAt   sql.NullTime
+	Role            string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Password)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Password, arg.Role)
 	var i CreateUserRow
 	err := row.Scan(
 		&i.ID,
@@ -51,12 +54,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateU
 		&i.Email,
 		&i.EmailVerifiedAt,
 		&i.DeactivatedAt,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-select id, created_at, updated_at, email, email_verified_at, deactivated_at from users where email = $1
+select id, created_at, updated_at, email, email_verified_at, deactivated_at, role from users where email = $1
 `
 
 type GetUserByEmailRow struct {
@@ -66,6 +70,7 @@ type GetUserByEmailRow struct {
 	Email           string
 	EmailVerifiedAt sql.NullTime
 	DeactivatedAt   sql.NullTime
+	Role            string
 }
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
@@ -78,12 +83,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 		&i.Email,
 		&i.EmailVerifiedAt,
 		&i.DeactivatedAt,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUserByEmailForAuth = `-- name: GetUserByEmailForAuth :one
-select id, created_at, updated_at, email, email_verified_at, deactivated_at, password from users where email = $1
+select id, created_at, updated_at, email, email_verified_at, deactivated_at, role, password from users where email = $1
 `
 
 type GetUserByEmailForAuthRow struct {
@@ -93,6 +99,7 @@ type GetUserByEmailForAuthRow struct {
 	Email           string
 	EmailVerifiedAt sql.NullTime
 	DeactivatedAt   sql.NullTime
+	Role            string
 	Password        string
 }
 
@@ -106,13 +113,14 @@ func (q *Queries) GetUserByEmailForAuth(ctx context.Context, email string) (GetU
 		&i.Email,
 		&i.EmailVerifiedAt,
 		&i.DeactivatedAt,
+		&i.Role,
 		&i.Password,
 	)
 	return i, err
 }
 
 const getUserById = `-- name: GetUserById :one
-select id, created_at, updated_at, email, email_verified_at, deactivated_at from users where id = $1
+select id, created_at, updated_at, email, email_verified_at, deactivated_at, role from users where id = $1
 `
 
 type GetUserByIdRow struct {
@@ -122,6 +130,7 @@ type GetUserByIdRow struct {
 	Email           string
 	EmailVerifiedAt sql.NullTime
 	DeactivatedAt   sql.NullTime
+	Role            string
 }
 
 func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (GetUserByIdRow, error) {
@@ -134,6 +143,7 @@ func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (GetUserByIdRow
 		&i.Email,
 		&i.EmailVerifiedAt,
 		&i.DeactivatedAt,
+		&i.Role,
 	)
 	return i, err
 }

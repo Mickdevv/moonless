@@ -1,6 +1,6 @@
 
 -- name: CreateUser :one
-insert into users(id, created_at, updated_at, email, email_verified_at, password, deactivated_at)
+insert into users(id, created_at, updated_at, email, email_verified_at, password, deactivated_at, role)
 values(
   gen_random_UUID(),
   NOW(),
@@ -8,16 +8,17 @@ values(
   $1,
   NULL,
   $2,
-  NULL
+  NULL,
+  $3
   )
-  returning id, created_at, updated_at, email, email_verified_at, deactivated_at;
+  returning id, created_at, updated_at, email, email_verified_at, deactivated_at, role;
 
 
 -- name: GetUserByEmail :one
-select id, created_at, updated_at, email, email_verified_at, deactivated_at from users where email = $1;
+select id, created_at, updated_at, email, email_verified_at, deactivated_at, role from users where email = $1;
 
 -- name: GetUserById :one
-select id, created_at, updated_at, email, email_verified_at, deactivated_at from users where id = $1;
+select id, created_at, updated_at, email, email_verified_at, deactivated_at, role from users where id = $1;
 
 -- name: GetUserByEmailForAuth :one
-select id, created_at, updated_at, email, email_verified_at, deactivated_at, password from users where email = $1;
+select id, created_at, updated_at, email, email_verified_at, deactivated_at, role, password from users where email = $1;

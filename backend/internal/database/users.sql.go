@@ -54,3 +54,86 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateU
 	)
 	return i, err
 }
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+select id, created_at, updated_at, email, email_verified_at, deactivated_at from users where email = $1
+`
+
+type GetUserByEmailRow struct {
+	ID              uuid.UUID
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	Email           string
+	EmailVerifiedAt sql.NullTime
+	DeactivatedAt   sql.NullTime
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var i GetUserByEmailRow
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Email,
+		&i.EmailVerifiedAt,
+		&i.DeactivatedAt,
+	)
+	return i, err
+}
+
+const getUserByEmailForAuth = `-- name: GetUserByEmailForAuth :one
+select id, created_at, updated_at, email, email_verified_at, deactivated_at, password from users where email = $1
+`
+
+type GetUserByEmailForAuthRow struct {
+	ID              uuid.UUID
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	Email           string
+	EmailVerifiedAt sql.NullTime
+	DeactivatedAt   sql.NullTime
+	Password        string
+}
+
+func (q *Queries) GetUserByEmailForAuth(ctx context.Context, email string) (GetUserByEmailForAuthRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmailForAuth, email)
+	var i GetUserByEmailForAuthRow
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Email,
+		&i.EmailVerifiedAt,
+		&i.DeactivatedAt,
+		&i.Password,
+	)
+	return i, err
+}
+
+const getUserById = `-- name: GetUserById :one
+select id, created_at, updated_at, email, email_verified_at, deactivated_at from users where id = $1
+`
+
+type GetUserByIdRow struct {
+	ID              uuid.UUID
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	Email           string
+	EmailVerifiedAt sql.NullTime
+	DeactivatedAt   sql.NullTime
+}
+
+func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (GetUserByIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserById, id)
+	var i GetUserByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Email,
+		&i.EmailVerifiedAt,
+		&i.DeactivatedAt,
+	)
+	return i, err
+}

@@ -4,6 +4,8 @@ import ProductsView from '@/views/ProductsView.vue'
 import AddProductView from '@/views/admin/products/AddProductView.vue'
 import UpdateProductView from '@/views/admin/products/UpdateProductView.vue'
 import ProductsTableView from '@/views/admin/products/ProductsTableView.vue'
+import LoginView from '@/views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +24,16 @@ const router = createRouter({
       path: '/shop',
       name: 'shop',
       component: ProductsView,
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterView,
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView,
     },
 
     // Admin parent

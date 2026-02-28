@@ -11,6 +11,36 @@ import (
 	"github.com/google/uuid"
 )
 
+type ContentLink struct {
+	ID           uuid.UUID
+	Platform     string
+	Title        string
+	Description  sql.NullString
+	Url          string
+	ThumbnailUrl sql.NullString
+	PublishedAt  sql.NullTime
+	IsFeatured   sql.NullBool
+	SortOrder    sql.NullInt32
+	CreatedAt    sql.NullTime
+	UpdatedAt    sql.NullTime
+}
+
+type Event struct {
+	ID               uuid.UUID
+	Type             string
+	PosterPath       sql.NullString
+	IsFeatured       sql.NullBool
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	StartDate        time.Time
+	EndDate          sql.NullTime
+	Description      sql.NullString
+	Title            string
+	LocationName     sql.NullString
+	LocationCity     sql.NullString
+	LocationMapsLink sql.NullString
+}
+
 type Product struct {
 	ID          uuid.UUID
 	CreatedAt   time.Time
@@ -32,6 +62,14 @@ type ProductImage struct {
 	IsPrimary bool
 }
 
+type RefreshToken struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	CreatedAt time.Time
+	ExpiresAt time.Time
+	RevokedAt sql.NullTime
+}
+
 type User struct {
 	ID              uuid.UUID
 	CreatedAt       time.Time
@@ -40,4 +78,5 @@ type User struct {
 	EmailVerifiedAt sql.NullTime
 	Password        string
 	DeactivatedAt   sql.NullTime
+	Role            string
 }

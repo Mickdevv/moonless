@@ -17,7 +17,6 @@ export const useAuthStore = defineStore('auth', () => {
   const accessTokenPayload = ref<JwtPayload>()
   const loading = ref<boolean>(false)
   const error = ref<string | null>(null)
-  const user = ref<User | null>(null)
 
   const login = async (credentials: LoginDTO) => {
     loading.value = true
@@ -74,5 +73,14 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       loading.value = false
     }
+  }
+  return {
+    register,
+    login,
+    error,
+    loading,
+    refreshToken,
+    accessToken,
+    accessTokenPayload,
   }
 })

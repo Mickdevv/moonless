@@ -8,8 +8,68 @@ import (
 	"github.com/Mickdevv/moonless/backend/api/utils"
 	"github.com/Mickdevv/moonless/backend/internal/database"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
+func RefreshTokenHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Invalid id", err)
+			return
+		}
+
+		refreshToken, err := serverCfg.DB.GetRefreshToken(r.Context(), id)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusUnauthorized, "Refresh token not found or invalid", err)
+			return
+		}
+
+		if refreshToken.ExpiresAt.Unix() < time.Now().Unix() || refreshToken.RevokedAt.Valid {
+			utils.RespondWithError(w, http.StatusUnauthorized, "Refresh token not found or invalid", nil)
+			return
+		}
+
+		user, err := serverCfg.DB.GetUserById(r.Context(), refreshToken.UserID)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusUnauthorized, "Refresh token not found or invalid", err)
+			return
+		}
+
+		token, err := makeJWT(serverCfg, CustomJwtClaims{
+			Role:  user.Role,
+			Email: user.Email,
+			RegisteredClaims: jwt.RegisteredClaims{
+				Subject:   user.ID.String(),
+				Issuer:    "moonless",
+				IssuedAt:  jwt.NewNumericDate(time.Now()),
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 5)),
+			},
+		})
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "Error creating token", err)
+			return
+		}
+
+		newRefreshToken, err := serverCfg.DB.MakeRefreshToken(r.Context(), database.MakeRefreshTokenParams{
+			UserID:    user.ID,
+			ExpiresAt: time.Now().Add(time.Minute * 60),
+		})
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "Something went wrong. Please try again later.", err)
+			return
+		}
+
+		err = serverCfg.DB.RevokeRefreshToken(r.Context(), refreshToken.ID)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "Something went wrong. Please try again later.", err)
+		}
+
+		res := loginResponse{RefreshToken: newRefreshToken.ID.String(), AccessToken: token}
+		utils.RespondWithJson(w, http.StatusOK, res)
+	}
+}
 func LoginHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var data loginPayload
@@ -36,7 +96,8 @@ func LoginHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 		}
 
 		refresh, err := serverCfg.DB.MakeRefreshToken(r.Context(), database.MakeRefreshTokenParams{
-			UserID: user.ID,
+			UserID:    user.ID,
+			ExpiresAt: time.Now().Add(time.Minute * 60),
 		})
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Something went wrong. Please try again later.", err)
@@ -102,15 +163,7 @@ func RegisterHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Username unavailable", err)
 			return
 		}
+
 		w.WriteHeader(http.StatusOK)
 	}
-}
-
-func validatePassword(password string) []string {
-	var validationErrors []string
-	if len(password) < 8 {
-		validationErrors = append(validationErrors, "Password must be at least 8 characters long")
-	}
-
-	return validationErrors
 }

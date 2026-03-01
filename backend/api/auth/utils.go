@@ -20,7 +20,7 @@ func makeJWT(serverCfg *utils.ServerCfg, claims CustomJwtClaims) (string, error)
 
 func validateJWT(serverCfg *utils.ServerCfg, token string) (CustomJwtClaims, error) {
 	t, err := jwt.ParseWithClaims(token, &CustomJwtClaims{}, func(t *jwt.Token) (any, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); ok {
+		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
 			return nil, errors.New("Incorrect signing method")
 		}
 		return []byte(serverCfg.JWT_SECRET), nil
@@ -56,4 +56,13 @@ func checkPassword(password string, hash string) (bool, error) {
 	}
 
 	return ok, nil
+}
+
+func validatePassword(password string) []string {
+	var validationErrors []string
+	if len(password) < 8 {
+		validationErrors = append(validationErrors, "Password must be at least 8 characters long")
+	}
+
+	return validationErrors
 }

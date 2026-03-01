@@ -9,4 +9,5 @@ import (
 func RegisterRoutes(mux *http.ServeMux, serverCfg *utils.ServerCfg) {
 	mux.HandleFunc("POST /api/register", RegisterHandler(serverCfg))
 	mux.HandleFunc("POST /api/login", LoginHandler(serverCfg))
+	mux.HandleFunc("GET /api/refresh/{id}", RefreshTokenHandler(serverCfg))
 }

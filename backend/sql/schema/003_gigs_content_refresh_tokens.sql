@@ -36,7 +36,7 @@ CREATE TABLE refresh_tokens(
   foreign key (user_id) references users(id) on delete cascade,
   created_at timestamp not null default NOW(),
   expires_at timestamp not null,
-  revoked_at timestamp
+  revoked_at timestamp default null
 );
 
 ALTER TABLE users ADD COLUMN role text not null default 'basic'; 

@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -15,8 +17,9 @@ type loginPayload struct {
 	Password string `json:"password"`
 }
 type loginResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken         string    `json:"access_token"`
+	RefreshToken        string    `json:"refresh_token"`
+	RefreshTokenExpires time.Time `json:"refresh_token_expires"`
 }
 
 type registerPayload struct {

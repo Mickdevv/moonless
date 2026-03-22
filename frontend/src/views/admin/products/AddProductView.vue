@@ -15,10 +15,12 @@ import { useToast } from "primevue/usetoast";
 import 'primeicons/primeicons.css'
 import { ref } from 'vue'
 import type { CreateProductImageDto } from '@/types/DTOs/CreateProductImage.dto'
+import { useAuthStore } from '@/stores/auth'
 
 
 const route = useRoute()
 const productStore = useProductStore()
+const authStore = useAuthStore()
 
 const confirm = useConfirm();
 const toast = useToast();
@@ -61,12 +63,13 @@ const confirm2 = (event: any) => {
       toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
     },
     reject: () => {
-      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+      toast.add({ severity: 'danger', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
     }
   });
 };
 
 onMounted(() => {
+  authStore.ensureToken()
   productStore.resetCurrentProduct()
 })
 

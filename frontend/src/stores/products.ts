@@ -6,6 +6,7 @@ import type { ProductImage } from '@/types/types/product-image'
 import { useToast } from 'primevue/usetoast'
 import type { CreateProductImageDto } from '@/types/DTOs/CreateProductImage.dto'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from './auth'
 
 export const useProductStore = defineStore('products', () => {
   const router = useRouter()
@@ -25,6 +26,8 @@ export const useProductStore = defineStore('products', () => {
     description: '',
   }
 
+  const authStore = useAuthStore()
+
   const createProductImage = async (image: File, productId: string) => {
     loading.value = true
     error.value = null
@@ -32,7 +35,10 @@ export const useProductStore = defineStore('products', () => {
       const formData = new FormData()
       formData.append('file', image)
       formData.append('data', JSON.stringify({ product_id: productId, is_primary: false }))
-      const res = await axios.post('/api/product-images', formData)
+
+      authStore.ensureToken()
+      const headers = { Authorization: `Bearer ${authStore.accessToken}` }
+      const res = await axios.post('/api/product-images', formData, { headers })
       const product = products.value.find((p) => p.id == productId)
       if (product) {
         if (product.images == null) {
@@ -71,7 +77,8 @@ export const useProductStore = defineStore('products', () => {
     loading.value = true
     error.value = null
     try {
-      const res = await axios.put(`/api/product-images/${productImageId}`)
+      const headers = { Authorization: `Bearer ${authStore.accessToken}` }
+      const res = await axios.put(`/api/product-images/${productImageId}`, { headers })
       if (currentProduct.value) {
         currentProduct.value.images = currentProduct.value.images.map((pi) => {
           if (pi.id == productImageId) {
@@ -118,7 +125,8 @@ export const useProductStore = defineStore('products', () => {
     loading.value = true
     error.value = null
     try {
-      const res = await axios.delete(`/api/product-images/${productImageId}`)
+      const headers = { Authorization: `Bearer ${authStore.accessToken}` }
+      const res = await axios.delete(`/api/product-images/${productImageId}`, { headers })
       const product = products.value.find((p) => p.id == productId)
       if (product) {
         product.images = product.images.filter((i) => i.id != res.data.product_image.id)
@@ -187,9 +195,16 @@ export const useProductStore = defineStore('products', () => {
   const createProduct = async (product: Product) => {
     try {
       loading.value = true
-      const res = await axios.post('/api/products', product)
+
+      authStore.ensureToken()
+
+      const headers = { Authorization: `Bearer ${authStore.accessToken}` }
+      authStore.ensureToken()
+      const res = await axios.post('/api/products', product, { headers })
       products.value.push(res.data.product_images)
+
       await router.push(`/admin/products/${res.data.id}`)
+
       toast.add({
         severity: 'success',
         summary: 'Confirmed',
@@ -211,7 +226,8 @@ export const useProductStore = defineStore('products', () => {
   const deleteProduct = async (id: string) => {
     try {
       loading.value = true
-      const res = await axios.delete(`/api/products/${id}`)
+      const headers = { Authorization: `Bearer ${authStore.accessToken}` }
+      const res = await axios.delete(`/api/products/${id}`, { headers })
       products.value = products.value.filter((p) => p.id != id)
       toast.add({
         severity: 'success',
@@ -251,7 +267,8 @@ export const useProductStore = defineStore('products', () => {
   const updateProduct = async (product: Product) => {
     try {
       loading.value = true
-      const res = await axios.put(`/api/products/${product.id}`, product)
+      const headers = { Authorization: `Bearer ${authStore.accessToken}` }
+      const res = await axios.put(`/api/products/${product.id}`, product, { headers })
 
       products.value = products.value.filter((p) => p.id != res.data.id)
       products.value.push(res.data)

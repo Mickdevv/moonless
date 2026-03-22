@@ -97,7 +97,7 @@ const confirm2 = (event: any) => {
       toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
     },
     reject: () => {
-      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+      toast.add({ severity: 'danger', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
     }
   });
 };

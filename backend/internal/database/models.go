@@ -39,6 +39,7 @@ type Event struct {
 	LocationName     sql.NullString
 	LocationCity     sql.NullString
 	LocationMapsLink sql.NullString
+	Active           sql.NullBool
 }
 
 type Product struct {

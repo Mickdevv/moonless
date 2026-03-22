@@ -8,11 +8,11 @@ import { Tag } from 'primevue';
 import { useProductStore } from '@/stores/products';
 
 const bandName = 'MOONLESS';
-const store = useProductStore();
+const productsStore = useProductStore();
 const router = useRouter();
 
 onMounted(() => {
-  store.getProducts();
+  productsStore.getProducts();
 });
 
 // Carousel responsiveness for different screen sizes
@@ -67,12 +67,13 @@ function openExternal(url: string) { window.open(url, '_blank', 'noopener,norefe
 
       <div class="carousel-container">
         <!-- Loading / Empty State -->
-        <div v-if="store.loading" class="p-6 text-center">Loading products...</div>
-        <div v-else-if="store.products.length === 0" class="p-6 text-center">No products available.</div>
+        <div v-if="productsStore.loading" class="p-6 text-center">Loading products...</div>
+        <div v-else-if="productsStore.products == null || productsStore.products.length === 0" class="p-6 text-center">
+          No products available.</div>
 
         <!-- Carousel -->
-        <Carousel v-else :value="store.products" :numVisible="3" :numScroll="3" :responsiveOptions="responsiveOptions"
-          :circular="true" :autoplayInterval="5000" class="product-carousel">
+        <Carousel v-else :value="productsStore.products" :numVisible="3" :numScroll="3"
+          :responsiveOptions="responsiveOptions" :circular="true" :autoplayInterval="5000" class="product-carousel">
           <template #item="{ data }">
             <Card class="carousel-card" @click="goToProduct(data.slug)">
               <div class="image-wrapper">

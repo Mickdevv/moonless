@@ -13,7 +13,8 @@ id UUID primary key unique,
   title text not null,
   location_name text,
   location_city text,
-  location_maps_link text
+  location_maps_link text,
+  active bool default true
 );
 
 CREATE TABLE content_links (

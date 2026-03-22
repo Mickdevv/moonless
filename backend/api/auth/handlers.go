@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -52,9 +53,10 @@ func RefreshTokenHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			return
 		}
 
+		newRefreshTokenExpires := time.Now().Add(time.Minute * 60)
 		newRefreshToken, err := serverCfg.DB.MakeRefreshToken(r.Context(), database.MakeRefreshTokenParams{
 			UserID:    user.ID,
-			ExpiresAt: time.Now().Add(time.Minute * 60),
+			ExpiresAt: newRefreshTokenExpires,
 		})
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Something went wrong. Please try again later.", err)
@@ -64,9 +66,11 @@ func RefreshTokenHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 		err = serverCfg.DB.RevokeRefreshToken(r.Context(), refreshToken.ID)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Something went wrong. Please try again later.", err)
+			return
 		}
 
-		res := loginResponse{RefreshToken: newRefreshToken.ID.String(), AccessToken: token}
+		res := loginResponse{RefreshToken: newRefreshToken.ID.String(), RefreshTokenExpires: newRefreshTokenExpires, AccessToken: token}
+		log.Println(res)
 		utils.RespondWithJson(w, http.StatusOK, res)
 	}
 }
@@ -97,7 +101,7 @@ func LoginHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 
 		refresh, err := serverCfg.DB.MakeRefreshToken(r.Context(), database.MakeRefreshTokenParams{
 			UserID:    user.ID,
-			ExpiresAt: time.Now().Add(time.Minute * 60),
+			ExpiresAt: time.Now().Add(time.Minute * 70),
 		})
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Something went wrong. Please try again later.", err)
@@ -119,7 +123,7 @@ func LoginHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			return
 		}
 
-		utils.RespondWithJson(w, http.StatusOK, loginResponse{AccessToken: token, RefreshToken: refresh.ID.String()})
+		utils.RespondWithJson(w, http.StatusOK, loginResponse{AccessToken: token, RefreshToken: refresh.ID.String(), RefreshTokenExpires: refresh.ExpiresAt})
 
 	}
 }

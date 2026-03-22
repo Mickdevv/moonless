@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   const router = useRouter()
   const accessToken = ref<string>()
   const refreshToken = ref<string>()
+  const refreshTokenExpires = ref<Date>()
   const accessTokenPayload = ref<JwtPayload>()
   const loading = ref<boolean>(false)
   const error = ref<string | null>(null)
@@ -25,10 +26,13 @@ export const useAuthStore = defineStore('auth', () => {
       const res = await axios.get(`/api/refresh/${refreshToken.value}`)
       accessToken.value = res.data.access_token
       refreshToken.value = res.data.refresh_token
-      localStorage.setItem('refresh_token', refreshToken.value!)
+      refreshTokenExpires.value = res.data.refresh_token_expires
       localStorage.setItem('access_token', accessToken.value!)
+      localStorage.setItem('refresh_token', refreshToken.value!)
+      localStorage.setItem('refresh_token_expires', refreshTokenExpires.value!.toDateString())
     } catch (err: any) {
       error.value = err
+      logout()
     } finally {
       loading.value = false
     }
@@ -42,10 +46,16 @@ export const useAuthStore = defineStore('auth', () => {
       const res = await axios.post('/api/login', credentials)
       accessToken.value = res.data.access_token
       refreshToken.value = res.data.refresh_token
+      refreshTokenExpires.value = new Date(res.data.refresh_token_expires)
+
+      console.log(res.data)
 
       if (accessToken.value) {
         accessTokenPayload.value = jwtDecode<JwtPayload>(accessToken.value)
         localStorage.setItem('access_token', accessToken.value)
+      }
+      if (refreshTokenExpires.value) {
+        localStorage.setItem('refresh_token_expires', String(refreshTokenExpires.value))
       }
       if (refreshToken.value) {
         localStorage.setItem('refresh_token', refreshToken.value)
@@ -59,10 +69,11 @@ export const useAuthStore = defineStore('auth', () => {
       })
     } catch (err: any) {
       error.value = err
+      logout()
       toast.add({
         severity: 'danger',
         summary: 'Error',
-        detail: err,
+        detail: `Please log in again: ${err}`,
         life: 3000,
       })
     } finally {
@@ -71,12 +82,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const register = async (registerDetails: RegisterDTO) => {
-    loading.value = false
+    loading.value = true
     error.value = null
 
     try {
       const res = await axios.post('/api/register', registerDetails)
-      router.push('/api/login')
+      router.push('/login')
       toast.add({
         severity: 'success',
         summary: 'Success',
@@ -95,8 +106,35 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = false
     }
   }
+
+  const logout = async () => {
+    console.log('logout - action')
+    refreshToken.value = undefined
+    accessToken.value = undefined
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    await router.push(`/login`)
+  }
+
+  const ensureToken = async () => {
+    if (!accessToken.value || !accessTokenPayload.value) {
+      return await logout()
+    }
+    const isAccessExpired = accessTokenPayload.value.exp * 1000 < Date.now()
+    const isRefreshExpired = isExpiredDate(refreshTokenExpires.value)
+
+    if (isAccessExpired) {
+      if (refreshToken.value && !isRefreshExpired) {
+        await refresh()
+      } else {
+        await logout()
+      }
+    }
+  }
+
   const accessTokenFromLocalStorage = localStorage.getItem('access_token')
   const refreshTokenFromLocalStorage = localStorage.getItem('refresh_token')
+  const refreshTokenExpiresFromLocalStorage = localStorage.getItem('refresh_token_expires')
 
   if (accessTokenFromLocalStorage) {
     accessToken.value = accessTokenFromLocalStorage
@@ -104,18 +142,32 @@ export const useAuthStore = defineStore('auth', () => {
   }
   if (refreshTokenFromLocalStorage) {
     refreshToken.value = refreshTokenFromLocalStorage
-    if (!accessTokenFromLocalStorage) {
-      refresh()
-    }
+  }
+  if (refreshTokenExpiresFromLocalStorage) {
+    refreshTokenExpires.value = new Date(refreshTokenExpiresFromLocalStorage)
+  }
+
+  const isExpiredUnix = (time: number | undefined) => {
+    return !time || time * 1000 < Date.now()
+  }
+  const isExpiredDate = (time: Date | undefined) => {
+    return !time || time.getTime() < Date.now()
+  }
+
+  if (refreshToken.value && isExpiredDate(refreshTokenExpires.value)) {
+    ensureToken()
   }
 
   return {
+    logout,
     register,
     login,
     error,
     loading,
     refreshToken,
+    refreshTokenExpires,
     accessToken,
     accessTokenPayload,
+    ensureToken,
   }
 })

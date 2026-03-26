@@ -77,6 +77,39 @@ func (q *Queries) CreateContentLink(ctx context.Context, arg CreateContentLinkPa
 	return i, err
 }
 
+const getContentLinkById = `-- name: GetContentLinkById :one
+SELECT id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at from content_links where id = $1
+`
+
+type GetContentLinkByIdRow struct {
+	ID           uuid.UUID
+	Platform     string
+	Title        string
+	Description  sql.NullString
+	Url          string
+	ThumbnailUrl sql.NullString
+	PublishedAt  sql.NullTime
+	CreatedAt    sql.NullTime
+	UpdatedAt    sql.NullTime
+}
+
+func (q *Queries) GetContentLinkById(ctx context.Context, id uuid.UUID) (GetContentLinkByIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getContentLinkById, id)
+	var i GetContentLinkByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Platform,
+		&i.Title,
+		&i.Description,
+		&i.Url,
+		&i.ThumbnailUrl,
+		&i.PublishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getContentLinks = `-- name: GetContentLinks :many
 SELECT id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at from content_links
 `

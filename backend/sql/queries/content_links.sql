@@ -13,5 +13,8 @@ VALUES (
   ) 
   returning id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at;
 
+-- name: GetContentLinkById :one
+SELECT id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at from content_links where id = $1;
+
 -- name: GetContentLinks :many
 SELECT id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at from content_links;

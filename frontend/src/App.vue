@@ -10,9 +10,16 @@ const toast = useToast();
 
 const items = ref([
   { label: 'Home', command: () => router.push({ name: 'home' }) },
+  { label: 'Content', command: () => router.push({ name: 'shop' }) },
+  { label: 'Events', command: () => router.push({ name: 'shop' }) },
   { label: 'Shop', command: () => router.push({ name: 'shop' }) },
+  { label: 'Contact', command: () => router.push({ name: 'shop' }) },
+  { label: 'Add event', command: () => router.push({ name: 'admin-events-add' }) },
+  { label: 'Events table', command: () => router.push({ name: 'admin-events' }) },
   { label: 'Add product', command: () => router.push({ name: 'admin-products-add' }) },
   { label: 'Products table', command: () => router.push({ name: 'admin-products' }) },
+  { label: 'Login', command: () => router.push({ name: 'login' }) },
+  { label: 'Register', command: () => router.push({ name: 'register' }) },
 ]);
 </script>
 

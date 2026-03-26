@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/Mickdevv/moonless/backend/api/auth"
+	contentlinks "github.com/Mickdevv/moonless/backend/api/contentLinks"
 	productimages "github.com/Mickdevv/moonless/backend/api/product_images"
 	"github.com/Mickdevv/moonless/backend/api/products"
 	"github.com/Mickdevv/moonless/backend/api/utils"
@@ -43,6 +44,7 @@ func main() {
 	products.RegisterRoutes(mux, &serverConfig)
 	auth.RegisterRoutes(mux, &serverConfig)
 	productimages.RegisterRoutes(mux, &serverConfig)
+	contentlinks.RegisterRoutes(mux, &serverConfig)
 
 	serverPort := os.Getenv("SERVER_PORT")
 	server := &http.Server{

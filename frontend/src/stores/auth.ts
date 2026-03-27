@@ -60,6 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (refreshToken.value) {
         localStorage.setItem('refresh_token', refreshToken.value)
       }
+      await router.push(`/`)
 
       toast.add({
         severity: 'success',
@@ -116,20 +117,31 @@ export const useAuthStore = defineStore('auth', () => {
     await router.push(`/login`)
   }
 
-  const ensureToken = async () => {
+  const ensureToken = async (attempts = 0): Promise<boolean> => {
     if (!accessToken.value || !accessTokenPayload.value) {
-      return await logout()
+      await logout()
+      return false
     }
+
     const isAccessExpired = accessTokenPayload.value.exp * 1000 < Date.now()
     const isRefreshExpired = isExpiredDate(refreshTokenExpires.value)
 
     if (isAccessExpired) {
       if (refreshToken.value && !isRefreshExpired) {
+        if (attempts > 2) {
+          await logout()
+          return false
+        }
         await refresh()
+        // TODO: Could be dangerous to have a recursive call like this
+        attempts += 1
+        await ensureToken(attempts)
       } else {
         await logout()
+        return false
       }
     }
+    return true
   }
 
   const accessTokenFromLocalStorage = localStorage.getItem('access_token')

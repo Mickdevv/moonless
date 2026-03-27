@@ -1,0 +1,166 @@
+package events
+
+import (
+	"database/sql"
+	"encoding/json"
+	"net/http"
+
+	"github.com/Mickdevv/moonless/backend/api/utils"
+	"github.com/Mickdevv/moonless/backend/internal/database"
+	"github.com/google/uuid"
+)
+
+func CreateEventHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var data Event
+		decoder := json.NewDecoder(r.Body)
+		defer r.Body.Close()
+
+		err := decoder.Decode(&data)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
+			return
+		}
+
+		event, err := serverCfg.DB.CreateEvent(r.Context(), database.CreateEventParams{
+			Type:             data.Type,
+			PosterPath:       sql.NullString{String: data.PosterPath},
+			IsFeatured:       data.IsFeatured,
+			StartDate:        data.StartDate,
+			EndDate:          sql.NullTime{Time: data.EndDate},
+			Description:      data.Description,
+			Title:            data.Title,
+			LocationName:     sql.NullString{String: data.LocationName},
+			LocationCity:     sql.NullString{String: data.LocationCity},
+			LocationMapsLink: sql.NullString{String: data.LocationMapsLink},
+		})
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
+			return
+		}
+
+		res := Event{
+			Id:               event.ID,
+			Type:             event.Type,
+			PosterPath:       event.PosterPath.String,
+			IsFeatured:       event.IsFeatured,
+			StartDate:        event.StartDate,
+			EndDate:          event.EndDate.Time,
+			Description:      event.Description,
+			Title:            event.Title,
+			LocationName:     event.LocationName.String,
+			LocationCity:     event.LocationCity.String,
+			LocationMapsLink: event.LocationMapsLink.String,
+			Active:           event.Active.Bool,
+			CreatedAt:        event.CreatedAt,
+			UpdatedAt:        event.UpdatedAt,
+		}
+
+		utils.RespondWithJson(w, http.StatusOK, res)
+	}
+}
+
+func GetActiveEventsHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		events, err := serverCfg.DB.GetActiveEvents(r.Context())
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Error fetching events", err)
+			return
+		}
+
+		var res []Event
+
+		for _, event := range events {
+			res = append(res, Event{
+				Id:               event.ID,
+				Type:             event.Type,
+				PosterPath:       event.PosterPath.String,
+				IsFeatured:       event.IsFeatured,
+				StartDate:        event.StartDate,
+				EndDate:          event.EndDate.Time,
+				Description:      event.Description,
+				Title:            event.Title,
+				LocationName:     event.LocationName.String,
+				LocationCity:     event.LocationCity.String,
+				LocationMapsLink: event.LocationMapsLink.String,
+				Active:           event.Active.Bool,
+				CreatedAt:        event.CreatedAt,
+				UpdatedAt:        event.UpdatedAt,
+			})
+		}
+
+		utils.RespondWithJson(w, http.StatusOK, res)
+	}
+}
+
+func GetAllEventsHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		events, err := serverCfg.DB.GetAllEvents(r.Context())
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Error fetching events", err)
+			return
+		}
+
+		var res []Event
+
+		for _, event := range events {
+			res = append(res, Event{
+				Id:               event.ID,
+				Type:             event.Type,
+				PosterPath:       event.PosterPath.String,
+				IsFeatured:       event.IsFeatured,
+				StartDate:        event.StartDate,
+				EndDate:          event.EndDate.Time,
+				Description:      event.Description,
+				Title:            event.Title,
+				LocationName:     event.LocationName.String,
+				LocationCity:     event.LocationCity.String,
+				LocationMapsLink: event.LocationMapsLink.String,
+				Active:           event.Active.Bool,
+				CreatedAt:        event.CreatedAt,
+				UpdatedAt:        event.UpdatedAt,
+			})
+		}
+
+		utils.RespondWithJson(w, http.StatusOK, res)
+	}
+}
+
+func GetEventByIdHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Invalid event id", err)
+			return
+		}
+
+		event, err := serverCfg.DB.GetEventById(r.Context(), id)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Event not found", err)
+			return
+		}
+
+		res := Event{
+			Id:               event.ID,
+			Type:             event.Type,
+			PosterPath:       event.PosterPath.String,
+			IsFeatured:       event.IsFeatured,
+			StartDate:        event.StartDate,
+			EndDate:          event.EndDate.Time,
+			Description:      event.Description,
+			Title:            event.Title,
+			LocationName:     event.LocationName.String,
+			LocationCity:     event.LocationCity.String,
+			LocationMapsLink: event.LocationMapsLink.String,
+			Active:           event.Active.Bool,
+			CreatedAt:        event.CreatedAt,
+			UpdatedAt:        event.UpdatedAt,
+		}
+
+		utils.RespondWithJson(w, http.StatusOK, res)
+	}
+}

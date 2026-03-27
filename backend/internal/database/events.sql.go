@@ -36,10 +36,10 @@ returning  id, type, poster_path, is_featured, created_at, updated_at, start_dat
 type CreateEventParams struct {
 	Type             string
 	PosterPath       sql.NullString
-	IsFeatured       sql.NullBool
+	IsFeatured       bool
 	StartDate        time.Time
 	EndDate          sql.NullTime
-	Description      sql.NullString
+	Description      string
 	Title            string
 	LocationName     sql.NullString
 	LocationCity     sql.NullString
@@ -80,34 +80,18 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (Event
 }
 
 const getActiveEvents = `-- name: GetActiveEvents :many
-SELECT id, type, poster_path, is_featured, created_at, updated_at, start_date, end_date, description, title, location_name, location_city, location_maps_link from events where active = true
+SELECT id, type, poster_path, is_featured, created_at, updated_at, start_date, end_date, description, title, location_name, location_city, location_maps_link, active from events where active = true
 `
 
-type GetActiveEventsRow struct {
-	ID               uuid.UUID
-	Type             string
-	PosterPath       sql.NullString
-	IsFeatured       sql.NullBool
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	StartDate        time.Time
-	EndDate          sql.NullTime
-	Description      sql.NullString
-	Title            string
-	LocationName     sql.NullString
-	LocationCity     sql.NullString
-	LocationMapsLink sql.NullString
-}
-
-func (q *Queries) GetActiveEvents(ctx context.Context) ([]GetActiveEventsRow, error) {
+func (q *Queries) GetActiveEvents(ctx context.Context) ([]Event, error) {
 	rows, err := q.db.QueryContext(ctx, getActiveEvents)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetActiveEventsRow
+	var items []Event
 	for rows.Next() {
-		var i GetActiveEventsRow
+		var i Event
 		if err := rows.Scan(
 			&i.ID,
 			&i.Type,
@@ -122,6 +106,7 @@ func (q *Queries) GetActiveEvents(ctx context.Context) ([]GetActiveEventsRow, er
 			&i.LocationName,
 			&i.LocationCity,
 			&i.LocationMapsLink,
+			&i.Active,
 		); err != nil {
 			return nil, err
 		}
@@ -137,34 +122,18 @@ func (q *Queries) GetActiveEvents(ctx context.Context) ([]GetActiveEventsRow, er
 }
 
 const getAllEvents = `-- name: GetAllEvents :many
-SELECT id, type, poster_path, is_featured, created_at, updated_at, start_date, end_date, description, title, location_name, location_city, location_maps_link from events
+SELECT id, type, poster_path, is_featured, created_at, updated_at, start_date, end_date, description, title, location_name, location_city, location_maps_link, active from events
 `
 
-type GetAllEventsRow struct {
-	ID               uuid.UUID
-	Type             string
-	PosterPath       sql.NullString
-	IsFeatured       sql.NullBool
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	StartDate        time.Time
-	EndDate          sql.NullTime
-	Description      sql.NullString
-	Title            string
-	LocationName     sql.NullString
-	LocationCity     sql.NullString
-	LocationMapsLink sql.NullString
-}
-
-func (q *Queries) GetAllEvents(ctx context.Context) ([]GetAllEventsRow, error) {
+func (q *Queries) GetAllEvents(ctx context.Context) ([]Event, error) {
 	rows, err := q.db.QueryContext(ctx, getAllEvents)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetAllEventsRow
+	var items []Event
 	for rows.Next() {
-		var i GetAllEventsRow
+		var i Event
 		if err := rows.Scan(
 			&i.ID,
 			&i.Type,
@@ -179,6 +148,7 @@ func (q *Queries) GetAllEvents(ctx context.Context) ([]GetAllEventsRow, error) {
 			&i.LocationName,
 			&i.LocationCity,
 			&i.LocationMapsLink,
+			&i.Active,
 		); err != nil {
 			return nil, err
 		}
@@ -194,28 +164,12 @@ func (q *Queries) GetAllEvents(ctx context.Context) ([]GetAllEventsRow, error) {
 }
 
 const getEventById = `-- name: GetEventById :one
-SELECT id, type, poster_path, is_featured, created_at, updated_at, start_date, end_date, description, title, location_name, location_city, location_maps_link from events where id = $1
+SELECT id, type, poster_path, is_featured, created_at, updated_at, start_date, end_date, description, title, location_name, location_city, location_maps_link, active from events where id = $1
 `
 
-type GetEventByIdRow struct {
-	ID               uuid.UUID
-	Type             string
-	PosterPath       sql.NullString
-	IsFeatured       sql.NullBool
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	StartDate        time.Time
-	EndDate          sql.NullTime
-	Description      sql.NullString
-	Title            string
-	LocationName     sql.NullString
-	LocationCity     sql.NullString
-	LocationMapsLink sql.NullString
-}
-
-func (q *Queries) GetEventById(ctx context.Context, id uuid.UUID) (GetEventByIdRow, error) {
+func (q *Queries) GetEventById(ctx context.Context, id uuid.UUID) (Event, error) {
 	row := q.db.QueryRowContext(ctx, getEventById, id)
-	var i GetEventByIdRow
+	var i Event
 	err := row.Scan(
 		&i.ID,
 		&i.Type,
@@ -230,6 +184,7 @@ func (q *Queries) GetEventById(ctx context.Context, id uuid.UUID) (GetEventByIdR
 		&i.LocationName,
 		&i.LocationCity,
 		&i.LocationMapsLink,
+		&i.Active,
 	)
 	return i, err
 }

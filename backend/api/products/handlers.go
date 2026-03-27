@@ -64,8 +64,9 @@ func CreateProduct(serverCfg *utils.ServerCfg) http.HandlerFunc {
 
 		data := CreateProductPayload{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&data)
+		defer r.Body.Close()
 
+		err := decoder.Decode(&data)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
 			return

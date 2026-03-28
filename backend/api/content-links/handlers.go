@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"path/filepath"
 
 	"github.com/Mickdevv/moonless/backend/api/utils"
 	"github.com/Mickdevv/moonless/backend/internal/database"
@@ -12,24 +13,27 @@ import (
 
 func CreateContentLinkHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data := CreateContentLinkPayload{}
+		params := CreateContentLinkPayload{}
 
-		decoder := json.NewDecoder(r.Body)
-		defer r.Body.Close()
-
-		err := decoder.Decode(&data)
+		err := json.Unmarshal([]byte(r.FormValue("data")), &params)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
 			return
 		}
 
+		filePath, err := utils.CreateStaticFile(serverCfg, filepath.Join("images", "products"), r)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Error creating file", err)
+			return
+		}
+
 		contentLink, err := serverCfg.DB.CreateContentLink(r.Context(), database.CreateContentLinkParams{
-			Title:        data.Title,
-			Description:  sql.NullString{String: data.Description, Valid: true},
-			Platform:     data.Platform,
-			Url:          data.Url,
-			ThumbnailUrl: sql.NullString{String: data.ThumbnailUrl, Valid: true},
-			PublishedAt:  sql.NullTime{Time: data.PublishedAt, Valid: true},
+			Title:        params.Title,
+			Description:  sql.NullString{String: params.Description},
+			Platform:     params.Platform,
+			Url:          params.Url,
+			ThumbnailUrl: sql.NullString{String: filePath},
+			PublishedAt:  sql.NullTime{Time: params.PublishedAt},
 		})
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Could not create content link", err)

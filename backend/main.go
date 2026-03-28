@@ -8,9 +8,9 @@ import (
 	"os"
 
 	"github.com/Mickdevv/moonless/backend/api/auth"
-	contentlinks "github.com/Mickdevv/moonless/backend/api/contentLinks"
+	contentlinks "github.com/Mickdevv/moonless/backend/api/content-links"
 	"github.com/Mickdevv/moonless/backend/api/events"
-	productimages "github.com/Mickdevv/moonless/backend/api/product_images"
+	productimages "github.com/Mickdevv/moonless/backend/api/product-images"
 	"github.com/Mickdevv/moonless/backend/api/products"
 	"github.com/Mickdevv/moonless/backend/api/utils"
 	"github.com/Mickdevv/moonless/backend/internal/database"

@@ -117,9 +117,11 @@ export const useAuthStore = defineStore('auth', () => {
     await router.push(`/login`)
   }
 
-  const ensureToken = async (attempts = 0): Promise<boolean> => {
+  const ensureToken = async (attempts = 0, redirect = true): Promise<boolean> => {
     if (!accessToken.value || !accessTokenPayload.value) {
-      await logout()
+      if (redirect) {
+        await logout()
+      }
       return false
     }
 
@@ -129,7 +131,9 @@ export const useAuthStore = defineStore('auth', () => {
     if (isAccessExpired) {
       if (refreshToken.value && !isRefreshExpired) {
         if (attempts > 2) {
-          await logout()
+          if (redirect) {
+            await logout()
+          }
           return false
         }
         await refresh()
@@ -137,7 +141,9 @@ export const useAuthStore = defineStore('auth', () => {
         attempts += 1
         await ensureToken(attempts)
       } else {
-        await logout()
+        if (redirect) {
+          await logout()
+        }
         return false
       }
     }

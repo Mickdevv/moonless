@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"path/filepath"
 
 	"github.com/Mickdevv/moonless/backend/api/utils"
 	"github.com/Mickdevv/moonless/backend/internal/database"
@@ -13,19 +14,22 @@ import (
 func CreateEventHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		var data Event
-		decoder := json.NewDecoder(r.Body)
-		defer r.Body.Close()
-
-		err := decoder.Decode(&data)
+		data := Event{}
+		err := json.Unmarshal([]byte(r.FormValue("data")), &data)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
 			return
 		}
 
+		filePath, err := utils.CreateStaticFile(serverCfg, filepath.Join("images", "events"), r)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "File error", err)
+			return
+		}
+
 		event, err := serverCfg.DB.CreateEvent(r.Context(), database.CreateEventParams{
 			Type:             data.Type,
-			PosterPath:       sql.NullString{String: data.PosterPath},
+			PosterPath:       sql.NullString{String: filePath},
 			IsFeatured:       data.IsFeatured,
 			StartDate:        data.StartDate,
 			EndDate:          sql.NullTime{Time: data.EndDate},

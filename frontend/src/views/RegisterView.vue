@@ -15,7 +15,7 @@ const credentials = reactive<RegisterDTO>({
 
 
 onMounted(async () => {
-  if (await authStore.ensureToken()) {
+  if (await authStore.ensureToken(0, false)) {
     await router.push(`/`)
   }
 })

@@ -101,11 +101,38 @@ export const useContentLinksStore = defineStore('content-links', () => {
       loading.value = false
     }
   }
+
+  const updateContentLink = async (contentLink: ContentLink) => {}
+
+  const deleteContentLink = async (id: string) => {
+    loading.value = false
+    error.value = null
+
+    try {
+      authStore.ensureToken()
+      const headers = { Authorization: `Bearer ${authStore.accessToken}` }
+      const res = await axios.delete(`/api/content-links/${id}`, { headers })
+      contentLinks.value = contentLinks.value.filter((cl) => cl.id != id)
+    } catch (err: any) {
+      error.value = err
+      toast.add({
+        severity: 'danger',
+        life: 3000,
+        summary: 'error',
+        detail: error.value,
+      })
+    } finally {
+      loading.value = false
+    }
+  }
   return {
-    createContentLink,
     currentContentLink,
+    contentLinks,
+    createContentLink,
     getContentLinks,
     getContentLinkById,
+    updateContentLink,
+    deleteContentLink,
     error,
     loading,
   }

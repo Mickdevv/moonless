@@ -94,7 +94,7 @@ func GetContentLinksHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			return
 		}
 
-		var res []ContentLink
+		res := []ContentLink{}
 
 		for _, contentLink := range contentLinks {
 			res = append(res, ContentLink{

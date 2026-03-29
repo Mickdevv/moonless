@@ -109,11 +109,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    console.log('logout - action')
     refreshToken.value = undefined
     accessToken.value = undefined
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
+    localStorage.removeItem('refresh_token_expires')
     await router.push(`/login`)
   }
 

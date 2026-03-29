@@ -36,7 +36,7 @@ export const useProductStore = defineStore('products', () => {
       formData.append('file', image)
       formData.append('data', JSON.stringify({ product_id: productId, is_primary: false }))
 
-      authStore.ensureToken()
+      await authStore.ensureToken()
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
       const res = await axios.post('/api/product-images', formData, { headers })
       const product = products.value.find((p) => p.id == productId)
@@ -77,6 +77,7 @@ export const useProductStore = defineStore('products', () => {
     loading.value = true
     error.value = null
     try {
+      await authStore.ensureToken()
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
       const res = await axios.put(`/api/product-images/${productImageId}`, { headers })
       if (currentProduct.value) {

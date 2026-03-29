@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useProductStore } from '@/stores/products';
+import { useContentLinksStore } from '@/stores/content-links';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';   // optional
@@ -16,9 +16,9 @@ import 'primeicons/primeicons.css'
 
 const confirm = useConfirm();
 
-const productsStore = useProductStore()
+const contentLinksStore = useContentLinksStore()
 onMounted(() => {
-  productsStore.getProducts()
+  contentLinksStore.getContentLinks()
 });
 
 
@@ -35,7 +35,7 @@ const stockSeverity = (stock: number) => {
   else if (stock > 0 && stock < 10) return 'warn';
   else return 'success';
 }
-const confirmDeleteProduct = (event: any, productId: string) => {
+const confirmDeleteContentLink = (event: any, contentLinkId: string) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Confirm',
@@ -49,7 +49,7 @@ const confirmDeleteProduct = (event: any, productId: string) => {
       label: 'Save'
     },
     accept: () => {
-      productsStore.deleteProduct(productId)
+      contentLinksStore.deleteContentLink(contentLinkId)
     },
   });
 };
@@ -57,10 +57,11 @@ const confirmDeleteProduct = (event: any, productId: string) => {
 </script>
 
 <template>
-  <div class="card" v-if="productsStore.products?.length">
-    <DataTable :value="productsStore.products" :rowClass="rowClass" :rowStyle="rowStyle" tableStyle="min-width: 50rem">
-      <Column field="name" header="Name"></Column>
-      <Column field="category" header="Category"></Column>
+  <div class="card" v-if="contentLinksStore.contentLinks?.length">
+    <DataTable :value="contentLinksStore.contentLinks" :rowClass="rowClass" :rowStyle="rowStyle"
+      tableStyle="min-width: 50rem">
+      <Column field="title" header="Title"></Column>
+      <Column field="platform" header="Platform"></Column>
       <Column field="active" header="Active">
         <template #body="slotProps">
           <i v-if="slotProps.data.active" class="pi pi-check"></i>
@@ -73,16 +74,16 @@ const confirmDeleteProduct = (event: any, productId: string) => {
 
         </template>
       </Column>
-      <Column field="stock" header="Stock">
+      <Column field="stock" header="Link">
         <template #body="slotProps">
           <Badge :value="slotProps.data.stock" :severity="stockSeverity(slotProps.data.stock)" />
         </template>
       </Column>
       <Column field="" header="">
         <template #body="slotProps">
-          <router-link :to="`/admin/products/${slotProps.data.id}`" class="editButton
+          <router-link :to="`/admin/content-links/${slotProps.data.id}`" class="editButton
             button"><i class="pi pi-pencil"></i></router-link>
-          <button class="deleteButton button" @click="confirmDeleteProduct($event, slotProps.data.id)"><i
+          <button class="deleteButton button" @click="confirmDeleteContentLink($event, slotProps.data.id)"><i
               class="pi pi-trash"></i></button>
           <ConfirmPopup></ConfirmPopup>
         </template>

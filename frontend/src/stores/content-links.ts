@@ -20,9 +20,9 @@ export const useContentLinksStore = defineStore('content-links', () => {
     thumbnail_url: '',
     is_featured: false,
     sort_order: 0,
-    published_at: Date.prototype,
-    created_at: Date.prototype,
-    updated_at: Date.prototype,
+    published_at: new Date(),
+    created_at: new Date(),
+    updated_at: new Date(),
   }
   const currentContentLink = ref<ContentLink>(structuredClone(blankContentLink))
   const contentLinks = ref<ContentLink[]>([])
@@ -31,14 +31,21 @@ export const useContentLinksStore = defineStore('content-links', () => {
 
   const authStore = useAuthStore()
 
-  const createContentLink = async (image: File, contentLink: CreateContentLinkDTO) => {
+  const resetCurrentContentLink = () => {
+    currentContentLink.value = structuredClone(blankContentLink)
+  }
+
+  const createContentLink = async (contentLink: CreateContentLinkDTO, image?: File) => {
     error.value = null
     loading.value = false
 
     try {
       const formData = new FormData()
       formData.append('data', JSON.stringify(contentLink))
-      formData.append('file', image)
+      if (image) {
+        formData.append('file', image)
+      }
+
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
       const res = await axios.post('/api/content-links', formData, { headers })
       contentLinks.value.push(res.data)
@@ -48,7 +55,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
         detail: 'Content link created',
         life: 3000,
       })
-      router.push(`/content-links/${res.data.id}`)
+      router.push(`admin/content-links/${res.data.id}`)
     } catch (err: any) {
       error.value = err
       toast.add({
@@ -126,6 +133,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
     }
   }
   return {
+    resetCurrentContentLink,
     currentContentLink,
     contentLinks,
     createContentLink,

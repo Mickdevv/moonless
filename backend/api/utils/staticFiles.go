@@ -16,6 +16,9 @@ func CreateStaticFile(serverCfg *ServerCfg, subdirectoryPath string, r *http.Req
 	}
 
 	file, handler, err := r.FormFile("file")
+	if file == nil {
+		return "", nil
+	}
 	if err != nil {
 		return "", err
 	}

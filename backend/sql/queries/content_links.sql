@@ -8,8 +8,8 @@ VALUES (
   $4, -- url
   $5, -- thumbnail_url
   $6, -- published_at
-  $7, -- created_at
-  $8 -- updated_at
+  NOW(), -- created_at
+  NOW() -- updated_at
   ) 
   returning id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at;
 

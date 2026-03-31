@@ -22,8 +22,8 @@ VALUES (
   $4, -- url
   $5, -- thumbnail_url
   $6, -- published_at
-  $7, -- created_at
-  $8 -- updated_at
+  NOW(), -- created_at
+  NOW() -- updated_at
   ) 
   returning id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at
 `
@@ -35,8 +35,6 @@ type CreateContentLinkParams struct {
 	Url          string
 	ThumbnailUrl sql.NullString
 	PublishedAt  sql.NullTime
-	CreatedAt    sql.NullTime
-	UpdatedAt    sql.NullTime
 }
 
 type CreateContentLinkRow struct {
@@ -59,8 +57,6 @@ func (q *Queries) CreateContentLink(ctx context.Context, arg CreateContentLinkPa
 		arg.Url,
 		arg.ThumbnailUrl,
 		arg.PublishedAt,
-		arg.CreatedAt,
-		arg.UpdatedAt,
 	)
 	var i CreateContentLinkRow
 	err := row.Scan(

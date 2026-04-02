@@ -24,12 +24,15 @@ const authStore = useAuthStore()
 const confirm = useConfirm();
 const toast = useToast();
 
+const currentContentLinkExists = ref<boolean>()
+
 const file = ref<File>()
 function onFileSelect(event: any) {
   file.value = event.target.files[0]
 }
 
-const confirm1 = (event: any) => {
+
+const confirmCreate = (event: any) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Are you sure you want to proceed?',
@@ -43,18 +46,51 @@ const confirm1 = (event: any) => {
       label: 'Save'
     },
     accept: () => {
-      contentLinkSubmit()
+      addContentLinkSubmit()
+    },
+  });
+};
+const confirmUpdate = (event: any) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to proceed?',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Save'
+    },
+    accept: () => {
+      updateContentLinkSubmit()
     },
   });
 };
 
+
 onMounted(() => {
   authStore.ensureToken()
-  contentLinkStore.resetCurrentContentLink()
+  const id = route.params.id as string
+  if (id) {
+    contentLinkStore.getContentLinkById(id)
+    currentContentLinkExists.value = true
+  } else {
+    contentLinkStore.resetCurrentContentLink()
+    currentContentLinkExists.value = false
+  }
 })
 
-function contentLinkSubmit() {
+function updateContentLinkSubmit() {
   if (contentLinkStore.currentContentLink) {
+    contentLinkStore.updateContentLink(contentLinkStore.currentContentLink)
+  }
+}
+
+function addContentLinkSubmit() {
+  if (contentLinkStore.currentContentLink) {
+    console.log(contentLinkStore.currentContentLink)
     contentLinkStore.createContentLink(contentLinkStore.currentContentLink, file.value)
   }
 }
@@ -67,11 +103,12 @@ function contentLinkSubmit() {
   <div class="page-container">
     <div v-if="contentLinkStore.currentContentLink && contentLinkStore.currentContentLink!.id == ''"
       class="form-container">
-      <h2>Edit content link</h2>
+      <h2 v-if="currentContentLinkExists">Edit content link</h2>
+      <h2 v-else>Add content link</h2>
 
       <!-- <form @submit.prevent="confirm1" class="flex flex-col gap-4"> -->
 
-      <form @submit.prevent="confirm1" class="flex flex-col gap-4">
+      <form @submit.prevent="confirmCreate" class="flex flex-col gap-4">
 
         <div class="field">
           <label>Title</label>
@@ -102,7 +139,9 @@ function contentLinkSubmit() {
           <input type="file" @change="onFileSelect" accept="image/*" />
         </div>
 
-        <Button type="submit" label="Add contentLink" severity="secondary" @click="confirm1($event)" />
+        <Button v-if="currentContentLinkExists" type="submit" label="Edit content link" severity="secondary"
+          @click="confirmUpdate($event)" />
+        <Button v-else type="submit" label="Add content link" severity="secondary" @click="confirmCreate($event)" />
         <ConfirmPopup></ConfirmPopup>
       </form>
 

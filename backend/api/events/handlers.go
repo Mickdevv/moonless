@@ -29,15 +29,15 @@ func CreateEventHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 
 		event, err := serverCfg.DB.CreateEvent(r.Context(), database.CreateEventParams{
 			Type:             data.Type,
-			PosterPath:       sql.NullString{String: filePath},
+			PosterPath:       sql.NullString{String: filePath, Valid: true},
 			IsFeatured:       data.IsFeatured,
 			StartDate:        data.StartDate,
-			EndDate:          sql.NullTime{Time: data.EndDate},
+			EndDate:          sql.NullTime{Time: data.EndDate, Valid: true},
 			Description:      data.Description,
 			Title:            data.Title,
-			LocationName:     sql.NullString{String: data.LocationName},
-			LocationCity:     sql.NullString{String: data.LocationCity},
-			LocationMapsLink: sql.NullString{String: data.LocationMapsLink},
+			LocationName:     sql.NullString{String: data.LocationName, Valid: true},
+			LocationCity:     sql.NullString{String: data.LocationCity, Valid: true},
+			LocationMapsLink: sql.NullString{String: data.LocationMapsLink, Valid: true},
 		})
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)

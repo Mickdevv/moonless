@@ -55,7 +55,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
         detail: 'Content link created',
         life: 3000,
       })
-      router.push(`admin/content-links/${res.data.id}`)
+      router.push({ name: 'admin-content-links-edit', params: { id: res.data.id } })
     } catch (err: any) {
       error.value = err
       toast.add({
@@ -109,7 +109,9 @@ export const useContentLinksStore = defineStore('content-links', () => {
     }
   }
 
-  const updateContentLink = async (contentLink: ContentLink) => {}
+  const updateContentLink = async (contentLink: ContentLink) => {
+    console.log('TODO: Update content link')
+  }
 
   const deleteContentLink = async (id: string) => {
     loading.value = false

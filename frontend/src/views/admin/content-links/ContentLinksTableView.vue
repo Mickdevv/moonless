@@ -62,21 +62,20 @@ const confirmDeleteContentLink = (event: any, contentLinkId: string) => {
       tableStyle="min-width: 50rem">
       <Column field="title" header="Title"></Column>
       <Column field="platform" header="Platform"></Column>
-      <Column field="active" header="Active">
+      <!-- <Column field="published_at" header="Published at"> -->
+      <!--   <template #body="slotProps"> -->
+      <!--     {{ slotProps.data.published_at.toLocaleDateString() }} -->
+      <!--   </template> -->
+      <!-- </Column> -->
+      <Column field="is_featured" header="Is featured">
         <template #body="slotProps">
-          <i v-if="slotProps.data.active" class="pi pi-check"></i>
+          <i v-if="slotProps.data.is_featured" class="pi pi-check"></i>
           <i v-else class="pi pi-times"></i>
         </template>
       </Column>
-      <Column field="price" header="Price">
+      <Column field="url" header="Link">
         <template #body="slotProps">
-
-
-        </template>
-      </Column>
-      <Column field="stock" header="Link">
-        <template #body="slotProps">
-          <Badge :value="slotProps.data.stock" :severity="stockSeverity(slotProps.data.stock)" />
+          <a :v-if="slotProps.data.url" :href="slotProps.data.url" target="new">link</a>
         </template>
       </Column>
       <Column field="" header="">

@@ -31,9 +31,15 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem('access_token', accessToken.value!)
       localStorage.setItem('refresh_token', refreshToken.value!)
       localStorage.setItem('refresh_token_expires', refreshTokenExpires.value!.toISOString())
+
+      console.warn(res)
+      console.log(accessToken.value, refreshToken.value, refreshTokenExpires.value)
+
       return true
     } catch (err: any) {
       error.value = err
+      console.error('Error when refreshing token')
+      console.error(err)
       await logout()
       return false
     } finally {
@@ -144,8 +150,10 @@ export const useAuthStore = defineStore('auth', () => {
           console.log('Attempt count exceeded: ' + attempts)
           return false
         }
-
-        await refresh()
+        if (await refresh()) {
+          console.log('REFRESH SUCCESSFUL')
+          return true
+        }
         // TODO: Could be dangerous to have a recursive call like this
         attempts += 1
         return await ensureToken(attempts)

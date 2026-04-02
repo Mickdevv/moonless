@@ -24,7 +24,7 @@ func validateJWT(serverCfg *utils.ServerCfg, token string) (CustomJwtClaims, err
 			return nil, errors.New("Incorrect signing method")
 		}
 		return []byte(serverCfg.JWT_SECRET), nil
-	}, jwt.WithLeeway(5*time.Second))
+	}, jwt.WithLeeway(50*time.Second))
 	if err != nil {
 		return CustomJwtClaims{}, err
 	}

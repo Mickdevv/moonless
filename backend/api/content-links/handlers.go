@@ -30,11 +30,11 @@ func CreateContentLinkHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 
 		contentLink, err := serverCfg.DB.CreateContentLink(r.Context(), database.CreateContentLinkParams{
 			Title:        params.Title,
-			Description:  sql.NullString{String: params.Description},
+			Description:  sql.NullString{String: params.Description, Valid: true},
 			Platform:     params.Platform,
 			Url:          params.Url,
-			ThumbnailUrl: sql.NullString{String: filePath},
-			PublishedAt:  sql.NullTime{Time: params.PublishedAt},
+			ThumbnailUrl: sql.NullString{String: filePath, Valid: true},
+			PublishedAt:  sql.NullTime{Time: params.PublishedAt, Valid: true},
 		})
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Could not create content link", err)
@@ -53,7 +53,7 @@ func CreateContentLinkHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			UpdatedAt:    contentLink.UpdatedAt.Time,
 		}
 
-		log.Println(res, contentLink, params.PublishedAt.UTC())
+		log.Println(res, contentLink.Description, params.Description)
 
 		utils.RespondWithJson(w, http.StatusOK, res)
 
@@ -102,6 +102,7 @@ func GetContentLinksHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 
 		for _, contentLink := range contentLinks {
 			res = append(res, ContentLink{
+				Id:           contentLink.ID,
 				Title:        contentLink.Title,
 				Description:  contentLink.Description.String,
 				Platform:     contentLink.Platform,

@@ -1,33 +1,38 @@
 <script setup lang="ts">
 import Product from '@/components/Product.vue';
 import { useProductStore } from '@/stores/products';
+import YouTube from 'vue3-youtube';
 import { onMounted } from 'vue';
+import { useContentLinksStore } from '@/stores/content-links';
 
-const productsStore = useProductStore()
+const contentLinkStore = useContentLinksStore()
 
 onMounted(() => {
-  productsStore.getProducts()
+  contentLinkStore.getContentLinks()
 })
 
 </script>
 <template>
-  <div class="products-list-container">
-    <div class="products-list">
-      <Product v-for="product in productsStore.products" :key="product.id" :product="product" />
-    </div>
-  </div>
+  <h2>Spotify</h2>
+  <iframe class="content_link" v-for="spotifyLink in contentLinkStore.contentLinks.filter((cl) =>
+    cl.platform.toLowerCase() == 'spotify')" data-testid="embed-iframe" style="border-radius:12px"
+    :src="spotifyLink.url.replace('/track', '/embed/track')" width="100%" height="352" frameBorder="0"
+    allowfullscreen="false" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    loading="lazy"></iframe>
+
+  <h2>Youtube</h2>
+  <YouTube class="content_link" v-for="youtubeVideo in contentLinkStore.contentLinks.filter((cl) =>
+    cl.platform.toLowerCase() == 'youtube')" :src="youtubeVideo.url" />
+
 </template>
+
 <style>
-.products-list-container {
+.content_link {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
+  margin-bottom: 1rem;
 }
 
-.products-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
+h2 {
+  margin: 1rem 1rem 0rem 5rem;
 }
 </style>

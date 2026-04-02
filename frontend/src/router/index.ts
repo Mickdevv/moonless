@@ -12,6 +12,8 @@ import AddEventView from '@/views/admin/events/AddEventView.vue'
 import EventsTableView from '@/views/admin/events/EventsTableView.vue'
 import ContentLinksTableView from '@/views/admin/content-links/ContentLinksTableView.vue'
 import UpdateContentLinkView from '@/views/admin/content-links/UpdateContentLinkView.vue'
+import ContentLinksView from '@/views/ContentLinksView.vue'
+import EventsView from '@/views/EventsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,6 +27,16 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: () => import('../views/AboutView.vue'),
+    },
+    {
+      path: '/content',
+      name: 'content',
+      component: ContentLinksView,
+    },
+    {
+      path: '/events',
+      name: 'events',
+      component: EventsView,
     },
     {
       path: '/shop',

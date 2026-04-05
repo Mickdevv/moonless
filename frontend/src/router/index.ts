@@ -6,6 +6,14 @@ import UpdateProductView from '@/views/admin/products/UpdateProductView.vue'
 import ProductsTableView from '@/views/admin/products/ProductsTableView.vue'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
+import AddContentLinkView from '@/views/admin/content-links/AddContentLinkView.vue'
+import UpdateEventView from '@/views/admin/events/UpdateEventView.vue'
+import AddEventView from '@/views/admin/events/AddEventView.vue'
+import EventsTableView from '@/views/admin/events/EventsTableView.vue'
+import ContentLinksTableView from '@/views/admin/content-links/ContentLinksTableView.vue'
+import UpdateContentLinkView from '@/views/admin/content-links/UpdateContentLinkView.vue'
+import ContentLinksView from '@/views/ContentLinksView.vue'
+import EventsView from '@/views/EventsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +27,16 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: () => import('../views/AboutView.vue'),
+    },
+    {
+      path: '/content',
+      name: 'content',
+      component: ContentLinksView,
+    },
+    {
+      path: '/events',
+      name: 'events',
+      component: EventsView,
     },
     {
       path: '/shop',
@@ -54,6 +72,39 @@ const router = createRouter({
           path: 'products/:id',
           name: 'admin-products-edit',
           component: UpdateProductView,
+          props: true,
+        },
+        {
+          path: 'events',
+          name: 'admin-events',
+          component: EventsTableView, // or AdminProductsView
+        },
+        {
+          path: 'events/add',
+          name: 'admin-events-add',
+          component: AddEventView,
+        },
+        {
+          path: 'events/:id',
+          name: 'admin-events-edit',
+          component: AddEventView,
+
+          props: true,
+        },
+        {
+          path: 'content-links',
+          name: 'admin-content-links',
+          component: ContentLinksTableView, // or AdminProductsView
+        },
+        {
+          path: 'content-links/add',
+          name: 'admin-content-links-add',
+          component: AddContentLinkView,
+        },
+        {
+          path: 'content-links/:id',
+          name: 'admin-content-links-edit',
+          component: AddContentLinkView,
           props: true,
         },
       ],

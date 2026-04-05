@@ -23,18 +23,19 @@ type ContentLink struct {
 	SortOrder    sql.NullInt32
 	CreatedAt    sql.NullTime
 	UpdatedAt    sql.NullTime
+	Active       bool
 }
 
 type Event struct {
 	ID               uuid.UUID
 	Type             string
 	PosterPath       sql.NullString
-	IsFeatured       sql.NullBool
+	IsFeatured       bool
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 	StartDate        time.Time
 	EndDate          sql.NullTime
-	Description      sql.NullString
+	Description      string
 	Title            string
 	LocationName     sql.NullString
 	LocationCity     sql.NullString

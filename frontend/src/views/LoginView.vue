@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
 import type { LoginDTO } from '@/types/DTOs/Login.dto';
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { Form } from '@primevue/forms';
 import { InputText, Message, Button } from 'primevue';
+import router from '@/router';
 
 const authStore = useAuthStore()
 const credentials = reactive<LoginDTO>({
@@ -11,6 +12,11 @@ const credentials = reactive<LoginDTO>({
   password: ""
 })
 
+onMounted(async () => {
+  if (await authStore.ensureToken()) {
+    await router.push(`/`)
+  }
+})
 
 const submitLogin = ($form: any) => {
   authStore.login({ email: $form.values.email, password: $form.values.password })
@@ -19,7 +25,7 @@ const submitLogin = ($form: any) => {
 
 </script>
 
-<template>Login screen
+<template>Log in
   <div>
     <Form v-slot="$form" :initialValues="credentials" @submit="submitLogin">
       <div>
@@ -37,8 +43,19 @@ const submitLogin = ($form: any) => {
       <Button type="submit" severity="secondary" label="Submit" />
     </Form>
   </div>
-  <router-link :to="`/register`" class="editButton
-            button">Register</router-link>
+  <span class="register-suggestion">
+    Need to create a new account? <router-link :to="`/register`">Register here</router-link>
+  </span>
 </template>
 
-<style scoped></style>
+<style scoped>
+.register-suggestion {
+  margin-top: 12px;
+}
+
+Form {
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+}
+</style>

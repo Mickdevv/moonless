@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	productimages "github.com/Mickdevv/moonless/backend/api/product_images"
+	productimages "github.com/Mickdevv/moonless/backend/api/product-images"
 	"github.com/Mickdevv/moonless/backend/api/utils"
 	"github.com/Mickdevv/moonless/backend/internal/database"
 	"github.com/google/uuid"
@@ -64,8 +64,9 @@ func CreateProduct(serverCfg *utils.ServerCfg) http.HandlerFunc {
 
 		data := CreateProductPayload{}
 		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&data)
+		defer r.Body.Close()
 
+		err := decoder.Decode(&data)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
 			return
@@ -178,7 +179,9 @@ func GetProducts(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			Products []Product `json:"products"`
 		}
 
-		res := response{}
+		res := response{
+			Products: []Product{},
+		}
 		for _, p := range products {
 			productImages, err := serverCfg.DB.GetProductImagesByProductId(r.Context(), p.ID)
 			if err != nil {

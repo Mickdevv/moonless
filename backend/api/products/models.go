@@ -3,7 +3,7 @@ package products
 import (
 	"time"
 
-	"github.com/Mickdevv/moonless/backend/api/product_images"
+	"github.com/Mickdevv/moonless/backend/api/product-images"
 	"github.com/google/uuid"
 )
 

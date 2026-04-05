@@ -3,33 +3,58 @@ package contentlinks
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/Mickdevv/moonless/backend/api/utils"
 	"github.com/Mickdevv/moonless/backend/internal/database"
 	"github.com/google/uuid"
 )
 
+func DeleteContentLinkByIdHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		idStr := r.PathValue("id")
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Invalid link id", err)
+			return
+		}
+
+		err = serverCfg.DB.DeleteContentLinkById(r.Context(), id)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Could not retrieve content links", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
 func CreateContentLinkHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data := CreateContentLinkPayload{}
+		params := CreateContentLinkPayload{}
 
-		decoder := json.NewDecoder(r.Body)
-		defer r.Body.Close()
-
-		err := decoder.Decode(&data)
+		err := json.Unmarshal([]byte(r.FormValue("data")), &params)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
 			return
 		}
 
+		filePath, err := utils.CreateStaticFile(serverCfg, filepath.Join("images", "products"), r)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Error creating file", err)
+			return
+		}
+
 		contentLink, err := serverCfg.DB.CreateContentLink(r.Context(), database.CreateContentLinkParams{
-			Title:        data.Title,
-			Description:  sql.NullString{String: data.Description, Valid: true},
-			Platform:     data.Platform,
-			Url:          data.Url,
-			ThumbnailUrl: sql.NullString{String: data.ThumbnailUrl, Valid: true},
-			PublishedAt:  sql.NullTime{Time: data.PublishedAt, Valid: true},
+			Title:        params.Title,
+			Description:  sql.NullString{String: params.Description, Valid: true},
+			Platform:     params.Platform,
+			Url:          params.Url,
+			ThumbnailUrl: sql.NullString{String: filePath, Valid: true},
+			PublishedAt:  sql.NullTime{Time: params.PublishedAt, Valid: true},
 		})
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, "Could not create content link", err)
@@ -37,6 +62,7 @@ func CreateContentLinkHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 		}
 
 		res := ContentLink{
+			Id:           contentLink.ID,
 			Title:        contentLink.Title,
 			Description:  contentLink.Description.String,
 			Platform:     contentLink.Platform,
@@ -46,6 +72,8 @@ func CreateContentLinkHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			CreatedAt:    contentLink.CreatedAt.Time,
 			UpdatedAt:    contentLink.UpdatedAt.Time,
 		}
+
+		log.Println(res, contentLink.Description, params.Description)
 
 		utils.RespondWithJson(w, http.StatusOK, res)
 
@@ -90,10 +118,11 @@ func GetContentLinksHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			return
 		}
 
-		var res []ContentLink
+		res := []ContentLink{}
 
 		for _, contentLink := range contentLinks {
 			res = append(res, ContentLink{
+				Id:           contentLink.ID,
 				Title:        contentLink.Title,
 				Description:  contentLink.Description.String,
 				Platform:     contentLink.Platform,

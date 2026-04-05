@@ -4,12 +4,12 @@ CREATE TABLE events(
 id UUID primary key unique,
   type text not null,
   poster_path text,
-  is_featured boolean, 
+  is_featured boolean not null default false, 
   created_at timestamp not null default NOW(),
   updated_at timestamp not null default NOW(),
   start_date timestamp not null,
   end_date timestamp,
-  description text,
+  description text not null,
   title text not null,
   location_name text,
   location_city text,
@@ -28,7 +28,8 @@ CREATE TABLE content_links (
   is_featured BOOLEAN DEFAULT false,
   sort_order INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT now(),
-  updated_at TIMESTAMP DEFAULT now()
+  updated_at TIMESTAMP DEFAULT now(),
+  active bool not null default true
 );
 
 CREATE TABLE refresh_tokens(

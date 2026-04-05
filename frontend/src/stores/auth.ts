@@ -20,6 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref<string | null>(null)
 
   const refresh = async () => {
+    console.log('REFRESH')
     loading.value = true
     error.value = null
     try {
@@ -29,10 +30,18 @@ export const useAuthStore = defineStore('auth', () => {
       refreshTokenExpires.value = res.data.refresh_token_expires
       localStorage.setItem('access_token', accessToken.value!)
       localStorage.setItem('refresh_token', refreshToken.value!)
-      localStorage.setItem('refresh_token_expires', refreshTokenExpires.value!.toDateString())
+      localStorage.setItem('refresh_token_expires', refreshTokenExpires.value!.toISOString())
+
+      console.warn(res)
+      console.log(accessToken.value, refreshToken.value, refreshTokenExpires.value)
+
+      return true
     } catch (err: any) {
       error.value = err
-      logout()
+      console.error('Error when refreshing token')
+      console.error(err)
+      await logout()
+      return false
     } finally {
       loading.value = false
     }
@@ -60,6 +69,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (refreshToken.value) {
         localStorage.setItem('refresh_token', refreshToken.value)
       }
+      await router.push(`/`)
 
       toast.add({
         severity: 'success',
@@ -108,28 +118,54 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    console.log('logout - action')
+    console.log('LOGOUT')
     refreshToken.value = undefined
     accessToken.value = undefined
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
+    localStorage.removeItem('refresh_token_expires')
     await router.push(`/login`)
   }
 
-  const ensureToken = async () => {
-    if (!accessToken.value || !accessTokenPayload.value) {
-      return await logout()
+  const ensureToken = async (attempts = 0, redirect = true): Promise<boolean> => {
+    if (!accessToken.value && !accessTokenPayload.value && !refreshToken.value) {
+      if (redirect) {
+        await logout()
+      }
+      return false
     }
-    const isAccessExpired = accessTokenPayload.value.exp * 1000 < Date.now()
+
+    const isAccessExpired = accessTokenPayload.value
+      ? accessTokenPayload.value.exp * 1000 < Date.now()
+      : false
     const isRefreshExpired = isExpiredDate(refreshTokenExpires.value)
 
     if (isAccessExpired) {
+      console.log('Access expired')
       if (refreshToken.value && !isRefreshExpired) {
-        await refresh()
+        if (attempts > 2) {
+          if (redirect) {
+            await logout()
+          }
+          console.log('Attempt count exceeded: ' + attempts)
+          return false
+        }
+        if (await refresh()) {
+          console.log('REFRESH SUCCESSFUL')
+          return true
+        }
+        // TODO: Could be dangerous to have a recursive call like this
+        attempts += 1
+        return await ensureToken(attempts)
       } else {
-        await logout()
+        console.log('Catch-all from refresh ', refreshToken.value, isRefreshExpired)
+        if (redirect) {
+          await logout()
+        }
+        return false
       }
     }
+    return true
   }
 
   const accessTokenFromLocalStorage = localStorage.getItem('access_token')
@@ -151,7 +187,10 @@ export const useAuthStore = defineStore('auth', () => {
     return !time || time * 1000 < Date.now()
   }
   const isExpiredDate = (time: Date | undefined) => {
-    return !time || time.getTime() < Date.now()
+    if (!time) return true
+
+    const date = time instanceof Date ? time : new Date(time)
+    return date.getTime() < Date.now()
   }
 
   if (refreshToken.value && isExpiredDate(refreshTokenExpires.value)) {

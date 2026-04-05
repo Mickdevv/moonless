@@ -147,7 +147,7 @@ function ContentLinkImageSubmit() {
           <input type="file" @change="onFileSelect" accept="image/*" />
         </div>
 
-        <Button type="submit" label="Add contentLink" severity="secondary" @click="confirm1($event)" />
+        <Button type="submit" label="Add content link" severity="secondary" @click="confirm1($event)" />
         <ConfirmPopup></ConfirmPopup>
       </form>
 
@@ -160,11 +160,7 @@ function ContentLinkImageSubmit() {
   </div>
 
   <div class="ContentLink-images-container">
-    <h2>ContentLink Images</h2>
-    <div>
-      <input type="file" @change="onFileSelect" accept="image/*" />
-      <Button label="Upload" @click="ContentLinkImageSubmit()" />
-    </div>
+    <h2>Content link Image</h2>
     <div v-if="contentLinkStore.currentContentLink?.thumbnail_url">
       <div class="image-card">
         <div>

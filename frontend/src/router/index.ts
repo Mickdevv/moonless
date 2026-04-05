@@ -87,7 +87,8 @@ const router = createRouter({
         {
           path: 'events/:id',
           name: 'admin-events-edit',
-          component: UpdateEventView,
+          component: AddEventView,
+
           props: true,
         },
         {
@@ -103,7 +104,7 @@ const router = createRouter({
         {
           path: 'content-links/:id',
           name: 'admin-content-links-edit',
-          component: UpdateContentLinkView,
+          component: AddContentLinkView,
           props: true,
         },
       ],

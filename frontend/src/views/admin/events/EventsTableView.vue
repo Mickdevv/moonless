@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useProductStore } from '@/stores/products';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';   // optional
@@ -13,12 +12,14 @@ import ConfirmPopup from 'primevue/confirmpopup';
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import 'primeicons/primeicons.css'
+import { event } from '@primeuix/themes/nora/timeline';
+import { useEventStore } from '@/stores/events';
 
 const confirm = useConfirm();
 
-const productsStore = useProductStore()
+const eventsStore = useEventStore()
 onMounted(() => {
-  productsStore.getProducts()
+  eventsStore.getEvents()
 });
 
 
@@ -35,7 +36,7 @@ const stockSeverity = (stock: number) => {
   else if (stock > 0 && stock < 10) return 'warn';
   else return 'success';
 }
-const confirmDeleteProduct = (event: any, productId: string) => {
+const confirmDeleteEvent = (event: any, eventId: string) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Confirm',
@@ -49,7 +50,7 @@ const confirmDeleteProduct = (event: any, productId: string) => {
       label: 'Save'
     },
     accept: () => {
-      productsStore.deleteProduct(productId)
+      eventsStore.deleteEvent(eventId)
     },
   });
 };
@@ -57,8 +58,9 @@ const confirmDeleteProduct = (event: any, productId: string) => {
 </script>
 
 <template>
-  <div class="card" v-if="productsStore.products?.length">
-    <DataTable :value="productsStore.products" :rowClass="rowClass" :rowStyle="rowStyle" tableStyle="min-width: 50rem">
+
+  <div class="card" v-if="eventsStore.events?.length">
+    <DataTable :value="eventsStore.events" :rowClass="rowClass" :rowStyle="rowStyle" tableStyle="min-width: 50rem">
       <Column field="name" header="Name"></Column>
       <Column field="category" header="Category"></Column>
       <Column field="active" header="Active">
@@ -80,14 +82,17 @@ const confirmDeleteProduct = (event: any, productId: string) => {
       </Column>
       <Column field="" header="">
         <template #body="slotProps">
-          <router-link :to="`/admin/products/${slotProps.data.id}`" class="editButton
+          <router-link :to="`/admin/events/${slotProps.data.id}`" class="editButton
             button"><i class="pi pi-pencil"></i></router-link>
-          <button class="deleteButton button" @click="confirmDeleteProduct($event, slotProps.data.id)"><i
+          <button class="deleteButton button" @click="confirmDeleteEvent($event, slotProps.data.id)"><i
               class="pi pi-trash"></i></button>
           <ConfirmPopup></ConfirmPopup>
         </template>
       </Column>
     </DataTable>
+  </div>
+  <div v-else>
+    <h2>No Events</h2>
   </div>
 </template>
 

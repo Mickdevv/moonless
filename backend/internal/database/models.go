@@ -23,6 +23,7 @@ type ContentLink struct {
 	SortOrder    sql.NullInt32
 	CreatedAt    sql.NullTime
 	UpdatedAt    sql.NullTime
+	Active       bool
 }
 
 type Event struct {

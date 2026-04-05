@@ -28,7 +28,8 @@ CREATE TABLE content_links (
   is_featured BOOLEAN DEFAULT false,
   sort_order INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT now(),
-  updated_at TIMESTAMP DEFAULT now()
+  updated_at TIMESTAMP DEFAULT now(),
+  active bool not null default true
 );
 
 CREATE TABLE refresh_tokens(

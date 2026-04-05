@@ -26,3 +26,6 @@ SELECT id, type, poster_path, is_featured, created_at, updated_at, start_date, e
 -- name: GetEventById :one
 SELECT id, type, poster_path, is_featured, created_at, updated_at, start_date, end_date, description, title, location_name, location_city, location_maps_link, active from events where id = $1;
 
+-- name: DeleteEventById :exec
+DELETE FROM events WHERE id = $1;
+

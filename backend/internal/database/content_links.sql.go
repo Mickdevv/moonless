@@ -73,6 +73,15 @@ func (q *Queries) CreateContentLink(ctx context.Context, arg CreateContentLinkPa
 	return i, err
 }
 
+const deleteContentLinkById = `-- name: DeleteContentLinkById :exec
+DELETE FROM content_links WHERE id = $1
+`
+
+func (q *Queries) DeleteContentLinkById(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteContentLinkById, id)
+	return err
+}
+
 const getContentLinkById = `-- name: GetContentLinkById :one
 SELECT id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at from content_links where id = $1
 `

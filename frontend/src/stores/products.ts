@@ -193,7 +193,7 @@ export const useProductStore = defineStore('products', () => {
     }
   }
 
-  const createProduct = async (product: Product) => {
+  const createProduct = async () => {
     try {
       loading.value = true
 
@@ -201,7 +201,7 @@ export const useProductStore = defineStore('products', () => {
 
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
       authStore.ensureToken()
-      const res = await axios.post('/api/products', product, { headers })
+      const res = await axios.post('/api/products', currentProduct.value, { headers })
       products.value.push(res.data.product_images)
 
       await router.push(`/admin/products/${res.data.id}`)

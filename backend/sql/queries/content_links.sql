@@ -18,3 +18,6 @@ SELECT id, platform, title, description, url, thumbnail_url, published_at, creat
 
 -- name: GetContentLinks :many
 SELECT id, platform, title, description, url, thumbnail_url, published_at, created_at, updated_at from content_links;
+
+-- name: DeleteContentLinkById :exec
+DELETE FROM content_links WHERE id = $1;

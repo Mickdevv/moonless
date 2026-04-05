@@ -12,6 +12,26 @@ import (
 	"github.com/google/uuid"
 )
 
+func DeleteContentLinkByIdHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		idStr := r.PathValue("id")
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Invalid link id", err)
+			return
+		}
+
+		err = serverCfg.DB.DeleteContentLinkById(r.Context(), id)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Could not retrieve content links", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
 func CreateContentLinkHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := CreateContentLinkPayload{}

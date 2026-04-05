@@ -3,6 +3,7 @@ package events
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"path/filepath"
 
@@ -11,11 +12,36 @@ import (
 	"github.com/google/uuid"
 )
 
+func DeleteEventByIdHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Invalid event id", err)
+			return
+		}
+
+		err = serverCfg.DB.DeleteEventById(r.Context(), id)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusNotFound, "Event not found", err)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
 func CreateEventHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		data := Event{}
-		err := json.Unmarshal([]byte(r.FormValue("data")), &data)
+		log.Println("CreateEventHandler")
+
+		err := r.ParseMultipartForm(10 << 20)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusBadRequest, "Error parsing request", err)
+			return
+		}
+
+		data := CreateEventPayload{}
+		err = json.Unmarshal([]byte(r.FormValue("data")), &data)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, "Payload error", err)
 			return
@@ -74,7 +100,7 @@ func GetActiveEventsHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			return
 		}
 
-		var res []Event
+		res := []Event{}
 
 		for _, event := range events {
 			res = append(res, Event{
@@ -108,7 +134,7 @@ func GetAllEventsHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			return
 		}
 
-		var res []Event
+		res := []Event{}
 
 		for _, event := range events {
 			res = append(res, Event{

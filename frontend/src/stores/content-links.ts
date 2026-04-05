@@ -37,7 +37,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
 
   const createContentLink = async (contentLink: CreateContentLinkDTO, image?: File) => {
     error.value = null
-    loading.value = false
+    loading.value = true
 
     try {
       const formData = new FormData()
@@ -70,7 +70,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
   }
 
   const getContentLinkById = async (id: string) => {
-    loading.value = false
+    loading.value = true
     error.value = null
 
     try {
@@ -90,7 +90,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
   }
 
   const getContentLinks = async () => {
-    loading.value = false
+    loading.value = true
     error.value = null
 
     try {
@@ -114,7 +114,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
   }
 
   const deleteContentLink = async (id: string) => {
-    loading.value = false
+    loading.value = true
     error.value = null
 
     try {

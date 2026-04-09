@@ -30,6 +30,11 @@ onMounted(async () => {
   let tiktokScript = document.createElement('script')
   tiktokScript.setAttribute('src', 'https://www.tiktok.com/embed.js')
   document.head.appendChild(tiktokScript)
+
+  let instagramScript = document.createElement('script')
+  instagramScript.setAttribute('src', "//www.instagram.com/embed.js")
+  document.head.appendChild(instagramScript)
+
 })
 
 const contactForm = ref<ContactForm>({
@@ -83,12 +88,12 @@ const contactFormSubmit = () => {
 
     <div class="contact-option">
       <h3>DM us on social media!</h3>
-      <iframe src="https://www.Instagram.com/moonlessoff/embed" width="700" height="400" frameborder="0" scrolling="no"
-        allowtransparency="true" style="border: none; overflow: hidden;">
+      <iframe src="https://www.Instagram.com/moonlessoff/embed" width="100%" frameborder="0" scrolling="no"
+        allowtransparency="true" style="border: none; overflow: hidden;" class="instagram-embed">
       </iframe>
 
       <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@moonlessoff" data-unique-id="moonlessoff"
-        data-embed-type="creator" style="max-width: 700px; min-width: 288px;">
+        data-embed-type="creator">
         <section> <a target="_blank" href="https://www.tiktok.com/@moonlessoff?refer=creator_embed">@moonlessoff</a>
         </section>
       </blockquote>
@@ -101,10 +106,20 @@ Button {
   margin: 2rem;
 }
 
+@media (min-width: 800px) {
+  .contact-option {
+    width: 700px;
+  }
+}
+
 .contact-option {
   padding-top: 2rem;
   padding-bottom: 2rem;
   border-top: solid;
+}
+
+.tiktok-embed .instagram-embed {
+  border-radius: 1rem;
 }
 
 .contact-form {

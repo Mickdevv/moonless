@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	productimages "github.com/Mickdevv/moonless/backend/api/product-images"
+	"github.com/Mickdevv/moonless/backend/api/productimages"
 	"github.com/Mickdevv/moonless/backend/api/utils"
 	"github.com/Mickdevv/moonless/backend/internal/database"
 	"github.com/google/uuid"

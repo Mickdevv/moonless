@@ -1,4 +1,4 @@
-package events
+package scheduleitems
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type CreateEventPayload struct {
+type CreateScheduleItemPayload struct {
 	Type             string    `json:"type"`
 	IsFeatured       bool      `json:"is_featured"`
 	StartDate        time.Time `json:"start_date"`
@@ -17,7 +17,7 @@ type CreateEventPayload struct {
 	LocationCity     string    `json:"location_city"`
 	LocationMapsLink string    `json:"location_maps_link"`
 }
-type Event struct {
+type ScheduleItem struct {
 	Id               uuid.UUID `json:"id"`
 	Type             string    `json:"type"`
 	PosterPath       string    `json:"poster_path"`

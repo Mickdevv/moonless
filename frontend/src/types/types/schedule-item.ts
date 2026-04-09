@@ -1,4 +1,4 @@
-export type Event = {
+export type ScheduleItem = {
   id: string
   title: string
   description: string

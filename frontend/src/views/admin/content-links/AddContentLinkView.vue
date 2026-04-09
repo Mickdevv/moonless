@@ -3,18 +3,19 @@ import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useContentLinksStore } from '@/stores/content-links'
 import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
 import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
 import ConfirmPopup from 'primevue/confirmpopup';
 import DatePicker from 'primevue/datepicker'
+import Select from 'primevue/select'
 
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import 'primeicons/primeicons.css'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { ContentLinkPlatform } from '@/types/enums/content-link-platform.enum'
 
 
 const route = useRoute()
@@ -95,16 +96,26 @@ function addContentLinkSubmit() {
   }
 }
 
+const contentLinkPlatformOptions = Object.values(ContentLinkPlatform)
+  .map((clv) => {
+    return {
+      label: clv,
+      value: clv
+    }
+  })
+
 
 
 </script>
 
 <template>
   <div class="page-container">
-    <div v-if="contentLinkStore.currentContentLink && contentLinkStore.currentContentLink!.id == ''"
-      class="form-container">
+    <div v-if="contentLinkStore.loading">
+      Loading Content link...
+    </div>
+    <div v-else-if="!contentLinkStore.loading" class="form-container">
       <h2 v-if="currentContentLinkExists">Edit content link</h2>
-      <h2 v-else>Add content link</h2>
+      <h2 v-if="!currentContentLinkExists">Add content link</h2>
 
       <!-- <form @submit.prevent="confirm1" class="flex flex-col gap-4"> -->
 
@@ -121,7 +132,10 @@ function addContentLinkSubmit() {
 
         <div class="field">
           <label>Platform</label>
-          <InputText required v-model="contentLinkStore.currentContentLink!.platform" class="w-full" />
+          <!-- <InputText required v-model="contentLinkStore.currentContentLink!.platform" class="w-full" /> -->
+          <Select v-model="contentLinkStore.currentContentLink.platform" :options="contentLinkPlatformOptions"
+            optionLabel="label" optionValue="value" placeholder="Select" class="w-full md:w-56" />
+
         </div>
 
         <div class="field">
@@ -147,10 +161,7 @@ function addContentLinkSubmit() {
 
     </div>
 
-    <div v-else>
-      Loading Content link...
-    </div>
-
+    <div v-else>An error occurred</div>
   </div>
 </template>
 

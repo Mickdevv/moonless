@@ -57,6 +57,7 @@ const confirmDeleteProduct = (event: any, productId: string) => {
 </script>
 
 <template>
+  <router-link :to="`/admin/products/add`"><i class="pi pi-plus"></i> Add product</router-link>
   <div class="card" v-if="productsStore.products?.length">
     <DataTable :value="productsStore.products" :rowClass="rowClass" :rowStyle="rowStyle" tableStyle="min-width: 50rem">
       <Column field="name" header="Name"></Column>

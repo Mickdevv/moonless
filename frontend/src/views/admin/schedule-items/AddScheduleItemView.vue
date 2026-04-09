@@ -14,21 +14,20 @@ import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import 'primeicons/primeicons.css'
 import { ref } from 'vue'
-import type { CreateEventDTO } from '@/types/DTOs/CreateEvent.dto'
-import { useEventStore } from '@/stores/events'
 import { useAuthStore } from '@/stores/auth'
+import { useScheduleItemStore } from '@/stores/schedule-items'
 
 
 const route = useRoute()
 const authStore = useAuthStore()
-const eventStore = useEventStore()
+const scheduleItemStore = useScheduleItemStore()
 
 const confirm = useConfirm();
 const toast = useToast();
 
-const currentEventExists = ref<boolean>()
+const currentScheduleItemExists = ref<boolean>()
 
-const confirmCreateEvent = (event: any) => {
+const confirmCreateScheduleItem = (event: any) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Are you sure you want to proceed?',
@@ -42,12 +41,12 @@ const confirmCreateEvent = (event: any) => {
       label: 'Save'
     },
     accept: () => {
-      createEventSubmit()
+      createScheduleItemSubmit()
     },
   });
 };
 
-const confirmUpdateEvent = (event: any) => {
+const confirmUpdateScheduleItem = (event: any) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Do you want to delete this record?',
@@ -62,7 +61,7 @@ const confirmUpdateEvent = (event: any) => {
       severity: 'danger'
     },
     accept: () => {
-      updateEventSubmit()
+      updateScheduleItemSubmit()
     },
     reject: () => {
       toast.add({ severity: 'danger', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
@@ -70,7 +69,7 @@ const confirmUpdateEvent = (event: any) => {
   });
 };
 
-const confirmDeleteEventImage = (event: any, id: string) => {
+const confirmDeleteScheduleItemImage = (event: any, id: string) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Confirm',
@@ -84,7 +83,7 @@ const confirmDeleteEventImage = (event: any, id: string) => {
       label: 'Save'
     },
     accept: () => {
-      // eventStore.deleteEventimage(eventStore.currentEvent!.id)
+      // eventStore.deleteEventimage(eventStore.currentScheduleItem!.id)
     },
   });
 };
@@ -93,26 +92,26 @@ onMounted(() => {
   authStore.ensureToken()
   const id = route.params.id as string
   if (id) {
-    eventStore.getEventById(id)
-    currentEventExists.value = true
+    scheduleItemStore.getScheduleItemById(id)
+    currentScheduleItemExists.value = true
   } else {
-    eventStore.resetCurrentEvent()
-    currentEventExists.value = false
+    scheduleItemStore.resetCurrentScheduleItem()
+    currentScheduleItemExists.value = false
   }
 })
 
-function updateEventSubmit() {
-  if (eventStore.currentEvent) {
-    // eventStore.updateEvent(eventStore.currentEvent)
+function updateScheduleItemSubmit() {
+  if (scheduleItemStore.currentScheduleItem) {
+    // eventStore.updateEvent(eventStore.currentScheduleItem)
   }
 }
 const file = ref(null)
 function onFileSelect(event: any) {
   file.value = event.target.files[0]
 }
-function createEventSubmit() {
+function createScheduleItemSubmit() {
   console.log("createEventSubmit")
-  eventStore.createEvent(file.value)
+  scheduleItemStore.createScheduleItem(file.value)
 }
 
 
@@ -121,69 +120,71 @@ function createEventSubmit() {
 <template>
   <div class="page-container">
     <div class="form-container">
-      <h2 v-if="!currentEventExists">Create event</h2>
+      <h2 v-if="!currentScheduleItemExists">Create event</h2>
       <h2 v-else>Update event</h2>
 
 
-      <form @submit.prevent="confirmCreateEvent" class="flex flex-col gap-4">
+      <form @submit.prevent="confirmCreateScheduleItem" class="flex flex-col gap-4">
 
         <div class="field">
           <label>Title</label>
-          <InputText required v-model="eventStore.currentEvent.title" class="w-full" />
+          <InputText required v-model="scheduleItemStore.currentScheduleItem.title" class="w-full" />
         </div>
         <div class="field">
           <label>Description</label>
-          <Textarea required v-model="eventStore.currentEvent.description" class="w-full" />
+          <Textarea v-model="scheduleItemStore.currentScheduleItem.description" class="w-full" />
         </div>
 
         <div class="field">
           <label>Type</label>
-          <InputText required v-model="eventStore.currentEvent.type" class="w-full" />
+          <InputText required v-model="scheduleItemStore.currentScheduleItem.type" class="w-full" />
         </div>
 
         <div class="field">
           <label>Start date</label>
-          <DatePicker showTime required v-model="eventStore.currentEvent.start_date" class="w-full" />
+          <DatePicker showTime required v-model="scheduleItemStore.currentScheduleItem.start_date" class="w-full" />
         </div>
         <div class="field">
           <label>End date</label>
-          <DatePicker showTime required v-model="eventStore.currentEvent.end_date" class="w-full" />
+          <DatePicker showTime required v-model="scheduleItemStore.currentScheduleItem.end_date" class="w-full" />
         </div>
 
         <div class="field">
           <label>Location title</label>
-          <Textarea required v-model="eventStore.currentEvent.location_name" class="w-full" />
+          <InputText required v-model="scheduleItemStore.currentScheduleItem.location_name" class="w-full" />
         </div>
         <div class="field">
           <label>Location city</label>
-          <Textarea required v-model="eventStore.currentEvent.location_city" class="w-full" />
+          <InputText required v-model="scheduleItemStore.currentScheduleItem.location_city" class="w-full" />
         </div>
         <div class="field">
           <label>Location maps link</label>
-          <Textarea required v-model="eventStore.currentEvent.location_maps_link" class="w-full" />
+          <InputText v-model="scheduleItemStore.currentScheduleItem.location_maps_link" class="w-full" />
         </div>
         <div class="field">
           <label>Image</label>
           <input type="file" @change="onFileSelect" accept="image/*" />
         </div>
 
-        <Button v-if="!currentEventExists" type="submit" label="Add event" severity="secondary"
-          @click="confirmCreateEvent($event)" />
-        <Button v-else type="submit" label="Add event" severity="secondary" @click="confirmUpdateEvent($event)" />
+        <Button v-if="!currentScheduleItemExists" type="submit" label="Add event" severity="secondary"
+          @click="confirmCreateScheduleItem($event)" />
+        <Button v-else type="submit" label="Add event" severity="secondary"
+          @click="confirmUpdateScheduleItem($event)" />
         <ConfirmPopup></ConfirmPopup>
       </form>
     </div>
   </div>
 
   <div class="event-images-container">
-    <div v-if="eventStore.currentEvent?.poster_path">
+    <div v-if="scheduleItemStore.currentScheduleItem?.poster_path">
       <div class="image-card">
         <div>
-          <img style="border-radius: 10px;" :src="`/api/${eventStore.currentEvent.poster_path}`" alt="image">
+          <img style="border-radius: 10px;" :src="`/api/${scheduleItemStore.currentScheduleItem.poster_path}`"
+            alt="image">
         </div>
         <div class="image-control-panel">
-          <Button severity="danger" @click="confirmDeleteEventImage($event,
-            eventStore.currentEvent.id)"><i class="pi pi-trash"></i></Button>
+          <Button severity="danger" @click="confirmDeleteScheduleItemImage($event,
+            scheduleItemStore.currentScheduleItem.id)"><i class="pi pi-trash"></i></Button>
           <ConfirmPopup></ConfirmPopup>
         </div>
       </div>

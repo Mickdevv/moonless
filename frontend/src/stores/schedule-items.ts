@@ -1,4 +1,4 @@
-import type { Event } from '@/types/types/event'
+import type { ScheduleItem } from '@/types/types/schedule-item'
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { useToast } from 'primevue'
@@ -7,17 +7,17 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from './auth'
 import type { JsonError } from '@/types/types/json-error'
 
-export const useEventStore = defineStore('events', () => {
+export const useScheduleItemStore = defineStore('scheduleItems', () => {
   const router = useRouter()
   const toast = useToast()
   const authStore = useAuthStore()
 
-  const events = ref<Event[]>([])
+  const scheduleItems = ref<ScheduleItem[]>([])
 
   const loading = ref<boolean>(false)
   const error = ref<any>(null)
 
-  const blankEvent: Event = {
+  const blankScheduleItem: ScheduleItem = {
     id: '',
     title: '',
     type: '',
@@ -33,25 +33,26 @@ export const useEventStore = defineStore('events', () => {
     updated_at: new Date(),
   }
 
-  const currentEvent = ref<Event>(structuredClone(blankEvent))
+  const currentScheduleItem = ref<ScheduleItem>(structuredClone(blankScheduleItem))
 
-  const resetCurrentEvent = () => (currentEvent.value = structuredClone(blankEvent))
+  const resetCurrentScheduleItem = () =>
+    (currentScheduleItem.value = structuredClone(blankScheduleItem))
 
-  const createEvent = async (image: File | null) => {
-    console.log('createEvent')
-    console.log('Current event: ', currentEvent.value)
+  const createScheduleItem = async (image: File | null) => {
+    console.log('createscheduleItem')
+    console.log('Current scheduleItem: ', currentScheduleItem.value)
     loading.value = true
     error.value = null
 
     try {
       const formData = new FormData()
-      formData.append('data', JSON.stringify(currentEvent.value))
+      formData.append('data', JSON.stringify(currentScheduleItem.value))
       if (image) formData.append('file', image)
 
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
-      const res = await axios.post('/api/events', formData, { headers })
-      events.value.push(res.data)
-      router.push({ name: 'admin-events-edit', params: { id: res.data.id } })
+      const res = await axios.post('/api/schedule-items', formData, { headers })
+      scheduleItems.value.push(res.data)
+      router.push({ name: 'admin-schedule-items-edit', params: { id: res.data.id } })
     } catch (err: any) {
       error.value = err.message
       toast.add({
@@ -65,13 +66,20 @@ export const useEventStore = defineStore('events', () => {
     }
   }
 
-  const getEventById = async (id: string) => {
+  const getScheduleItemById = async (id: string) => {
     loading.value = true
     error.value = null
 
+    console.log(id)
     try {
-      const res = await axios.get(`/api/events/${id}`)
-      currentEvent.value = res.data
+      const res = await axios.get(`/api/schedule-items/${id}`)
+      currentScheduleItem.value = {
+        ...res.data,
+        end_date: new Date(res.data.end_date),
+        start_date: new Date(res.data.start_date),
+        created_at: new Date(res.data.created_at),
+        updated_at: new Date(res.data.updated_at),
+      }
     } catch (err: any) {
       error.value = err.message
       toast.add({
@@ -84,12 +92,20 @@ export const useEventStore = defineStore('events', () => {
       loading.value = false
     }
   }
-  const getEvents = async () => {
+  const getScheduleItems = async () => {
     loading.value = true
     error.value = null
     try {
-      const res = await axios.get('/api/events')
-      events.value = res.data
+      const res = await axios.get('/api/schedule-items')
+      scheduleItems.value = res.data.map((e: ScheduleItem) => {
+        return {
+          ...e,
+          end_date: new Date(e.end_date),
+          start_date: new Date(e.start_date),
+          created_at: new Date(e.created_at),
+          updated_at: new Date(e.updated_at),
+        }
+      })
     } catch (err: any) {
       error.value = err.message
       toast.add({
@@ -103,14 +119,14 @@ export const useEventStore = defineStore('events', () => {
     }
   }
 
-  const deleteEvent = async (id: string) => {
+  const deleteScheduleItem = async (id: string) => {
     loading.value = true
     error.value = null
 
     try {
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
-      const res = await axios.delete(`/api/events/${id}`)
-      events.value = events.value.filter((e) => e.id != id)
+      const res = await axios.delete(`/api/schedule-items/${id}`)
+      scheduleItems.value = scheduleItems.value.filter((e: ScheduleItem) => e.id != id)
     } catch (err: any) {
       error.value = err.message
       toast.add({
@@ -125,14 +141,14 @@ export const useEventStore = defineStore('events', () => {
   }
 
   return {
-    getEventById,
-    getEvents,
-    deleteEvent,
-    createEvent,
+    getScheduleItemById,
+    getScheduleItems,
+    deleteScheduleItem,
+    createScheduleItem,
     error,
     loading,
-    currentEvent,
-    events,
-    resetCurrentEvent,
+    currentScheduleItem,
+    scheduleItems,
+    resetCurrentScheduleItem,
   }
 })

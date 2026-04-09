@@ -13,30 +13,18 @@ import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import 'primeicons/primeicons.css'
 import { event } from '@primeuix/themes/nora/timeline';
-import { useEventStore } from '@/stores/events';
+import { formatDate } from '@/utils/fomatting';
+import { useScheduleItemStore } from '@/stores/schedule-items';
 
 const confirm = useConfirm();
 
-const eventsStore = useEventStore()
+const scheduleItemsStore = useScheduleItemStore()
 onMounted(() => {
-  eventsStore.getEvents()
+  scheduleItemsStore.getScheduleItems()
 });
 
 
-const rowClass = (data: any) => {
-  return [{ '!bg-primary !text-primary-contrast': data.category === 'Fitness' }];
-};
-const rowStyle = (data: any) => {
-  if (data.quantity === 0) {
-    return { fontWeight: 'bold', fontStyle: 'italic' };
-  }
-};
-const stockSeverity = (stock: number) => {
-  if (stock == 0) return 'danger';
-  else if (stock > 0 && stock < 10) return 'warn';
-  else return 'success';
-}
-const confirmDeleteEvent = (event: any, eventId: string) => {
+const confirmDeleteScheduleItem = (event: any, scheduleItemId: string) => {
   confirm.require({
     target: event.currentTarget,
     message: 'Confirm',
@@ -50,7 +38,7 @@ const confirmDeleteEvent = (event: any, eventId: string) => {
       label: 'Save'
     },
     accept: () => {
-      eventsStore.deleteEvent(eventId)
+      scheduleItemsStore.deleteScheduleItem(scheduleItemId)
     },
   });
 };
@@ -59,32 +47,36 @@ const confirmDeleteEvent = (event: any, eventId: string) => {
 
 <template>
 
-  <div class="card" v-if="eventsStore.events?.length">
-    <DataTable :value="eventsStore.events" :rowClass="rowClass" :rowStyle="rowStyle" tableStyle="min-width: 50rem">
-      <Column field="name" header="Name"></Column>
-      <Column field="category" header="Category"></Column>
+  <router-link :to="`/admin/schedule-items/add`"><i class="pi pi-plus"></i> Add schedule item</router-link>
+  <div class="card" v-if="scheduleItemsStore.scheduleItems?.length">
+    <DataTable :loading="scheduleItemsStore.loading" :value="scheduleItemsStore.scheduleItems"
+      tableStyle="min-width: 50rem">
+      <Column field="title" header="Title"></Column>
+      <Column field="type" header="Type"></Column>
+      <Column field="location_city" header="City"></Column>
+      <Column field="location_name" header="Location"></Column>
+      <Column field="is_featured" header="Featured">
+        <template #body="slotProps">
+          <i v-if="slotProps.data.active" class="pi pi-check"></i>
+          <i v-else class="pi pi-times"></i>
+        </template>
+      </Column>
       <Column field="active" header="Active">
         <template #body="slotProps">
           <i v-if="slotProps.data.active" class="pi pi-check"></i>
           <i v-else class="pi pi-times"></i>
         </template>
       </Column>
-      <Column field="price" header="Price">
+      <Column field="start_date" header="Start date">
         <template #body="slotProps">
-
-
-        </template>
-      </Column>
-      <Column field="stock" header="Stock">
-        <template #body="slotProps">
-          <Badge :value="slotProps.data.stock" :severity="stockSeverity(slotProps.data.stock)" />
+          <p>{{ formatDate(slotProps.data.start_date) }}</p>
         </template>
       </Column>
       <Column field="" header="">
         <template #body="slotProps">
-          <router-link :to="`/admin/events/${slotProps.data.id}`" class="editButton
+          <router-link :to="`/admin/schedule-items/${slotProps.data.id}`" class="editButton
             button"><i class="pi pi-pencil"></i></router-link>
-          <button class="deleteButton button" @click="confirmDeleteEvent($event, slotProps.data.id)"><i
+          <button class="deleteButton button" @click="confirmDeleteScheduleItem($event, slotProps.data.id)"><i
               class="pi pi-trash"></i></button>
           <ConfirmPopup></ConfirmPopup>
         </template>
@@ -92,7 +84,7 @@ const confirmDeleteEvent = (event: any, eventId: string) => {
     </DataTable>
   </div>
   <div v-else>
-    <h2>No Events</h2>
+    <h2>No schedule items</h2>
   </div>
 </template>
 

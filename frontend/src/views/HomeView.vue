@@ -6,6 +6,7 @@ import Card from 'primevue/card';
 import Carousel from 'primevue/carousel';
 import { Tag } from 'primevue';
 import { useProductStore } from '@/stores/products';
+import Galleria from 'primevue/galleria';
 
 const bandName = 'MOONLESS';
 const productStore = useProductStore();
@@ -15,61 +16,52 @@ onMounted(() => {
   productStore.getProducts();
 });
 
-// Carousel responsiveness for different screen sizes
-const responsiveOptions = ref([
-  { breakpoint: '1399px', numVisible: 3, numScroll: 3 },
-  { breakpoint: '1000px', numVisible: 2, numScroll: 2 },
-  { breakpoint: '700px', numVisible: 1, numScroll: 1 }
-]);
+const images = ref([{
+  itemImageSrc: '/api/static/images/misc/655833948_10243354944988101_8603034280536231668_n.jpg',
+  alt: 'Description for Image 1',
+  title: 'Title 1'
+}, {
+  itemImageSrc: '/api/static/images/misc/656173332_10243354940187981_7768129687893519335_n.jpg',
+  alt: 'Description for Image 1',
+  title: 'Title 1'
+}, {
+  itemImageSrc: '/api/static/images/misc/657085083_10243354929467713_3260572721449297061_n.jpg',
+  alt: 'Description for Image 1',
+  title: 'Title 1'
+},
+])
+const activeIndex = ref(0)
+const responsiveOptions = ref()
 
-// Severity color for stock
-const getSeverity = (stock: number) => {
-  if (stock < 5) return 'danger';
-  if (stock < 15) return 'warn';
-  return 'success';
+const next = () => {
+  activeIndex.value = activeIndex.value === images.value.length - 1 ? images.value.length - 1 : activeIndex.value + 1;
 };
-
-// Navigation
-function goToShop() { router.push({ name: 'shop' }); }
-function goToMusic() { router.push({ name: 'music' }); }
-function goToProduct(slug: string) { router.push({ name: 'product', params: { slug } }); }
-function openExternal(url: string) { window.open(url, '_blank', 'noopener,noreferrer'); }
-
+const prev = () => {
+  activeIndex.value = activeIndex.value === 0 ? 0 : activeIndex.value - 1;
+};
 </script>
 
 <template>
-  <div class="landing-page">
-    <!-- PRODUCT CAROUSEL -->
+  <div class="card">
 
-    <div v-if="productStore.loading" class="p-6 text-center">Loading products...</div>
-    <div v-else-if="productStore.products.length === 0" class="p-6 text-center">No products available.</div>
-    <Carousel v-else :value="productStore.products" :numVisible="3" :numScroll="3"
-      :responsiveOptions="responsiveOptions">
-      <template #item="{ data }">
-        <div class="carousel-card" @click="goToProduct(data.id)">
-          <div class="">
-            <div class="">
-              <img v-if="data.images?.length" :src="'/api/' + data.images[0].path" :alt="data.name"
-                class="carousel-image" />
-              <Tag v-if="data.stock !== undefined" :value="`${data.stock} in stock`" :severity="getSeverity(data.stock)"
-                class="stock-tag" />
-            </div>
-          </div>
-          <div class="mb-4 font-medium">{{ data.name }}</div>
-          <div class="">
-            <p class="product-price">{{ data.price.toFixed(2) }}</p>
-            <span>
-              <Button icon="pi pi-eye" severity="secondary" variant="outlined" />
-              <Button icon="pi pi-shopping-cart" class="ml-2" />
-            </span>
-          </div>
-        </div>
+    <Galleria v-model:activeIndex="activeIndex" :value="images" :responsiveOptions="responsiveOptions" :numVisible="5"
+      containerStyle="width: 100%" :showThumbnails="false" :showIndicators="true" :circular="true" :autoPlay="true"
+      :transitionInterval="5000" :showItemNavigators="true">
+      <template #item="slotProps">
+        <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%" />
       </template>
-    </Carousel>
+      <template #thumbnail="slotProps">
+        <img class="carousel-thumbnail" :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" />
+      </template>
+    </Galleria>
   </div>
 </template>
 
 <style scoped>
+.carousel-thumbnail {
+  max-width: 5rem;
+}
+
 .carousel-card {
   cursor: pointer;
   display: flex;
@@ -85,5 +77,9 @@ function openExternal(url: string) { window.open(url, '_blank', 'noopener,norefe
   border-radius: 15px;
   /* or any reasonable value */
   object-fit: cover;
+}
+
+.card {
+  display: block;
 }
 </style>

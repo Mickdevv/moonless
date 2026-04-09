@@ -1,4 +1,4 @@
-export type CreateEventDTO = {
+export type CreateScheduleItemDTO = {
   type: string
   poster_path: string
   is_featured: boolean

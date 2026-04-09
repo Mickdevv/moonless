@@ -1,6 +1,8 @@
+import type { ContentLinkPlatform } from '../enums/content-link-platform.enum'
+
 export type CreateContentLinkDTO = {
   id: string
-  platform: string
+  platform: ContentLinkPlatform
   title: string
   description: string
   url: string

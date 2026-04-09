@@ -121,6 +121,7 @@ export const useAuthStore = defineStore('auth', () => {
     console.log('LOGOUT')
     refreshToken.value = undefined
     accessToken.value = undefined
+    accessTokenPayload.value = undefined
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
     localStorage.removeItem('refresh_token_expires')

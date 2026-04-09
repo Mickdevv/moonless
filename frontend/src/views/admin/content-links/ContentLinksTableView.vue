@@ -6,7 +6,7 @@ import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';   // optional
 import Row from 'primevue/row';
 import Badge from 'primevue/badge';
-
+import Button from 'primevue/button'
 import ConfirmPopup from 'primevue/confirmpopup';
 
 
@@ -57,9 +57,10 @@ const confirmDeleteContentLink = (event: any, contentLinkId: string) => {
 </script>
 
 <template>
+  <router-link :to="`/admin/content-links/add`"><i class="pi pi-plus"></i> Add content link</router-link>
   <div class="card" v-if="contentLinksStore.contentLinks?.length">
-    <DataTable :value="contentLinksStore.contentLinks" :rowClass="rowClass" :rowStyle="rowStyle"
-      tableStyle="min-width: 50rem">
+    <DataTable :loading="contentLinksStore.loading" :value="contentLinksStore.contentLinks" :rowClass="rowClass"
+      :rowStyle="rowStyle" tableStyle="min-width: 50rem">
       <Column field="title" header="Title"></Column>
       <Column field="platform" header="Platform"></Column>
       <!-- <Column field="published_at" header="Published at"> -->
@@ -80,7 +81,7 @@ const confirmDeleteContentLink = (event: any, contentLinkId: string) => {
       </Column>
       <Column field="" header="">
         <template #body="slotProps">
-          <router-link :to="`/admin/content-links/${slotProps.data.id}`" class="editButton
+          <router-link :to="`/admin/discography/${slotProps.data.id}`" class="editButton
             button"><i class="pi pi-pencil"></i></router-link>
           <button class="deleteButton button" @click="confirmDeleteContentLink($event, slotProps.data.id)"><i
               class="pi pi-trash"></i></button>

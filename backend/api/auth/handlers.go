@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -70,7 +69,6 @@ func RefreshTokenHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 		}
 
 		res := loginResponse{RefreshToken: newRefreshToken.ID.String(), RefreshTokenExpires: newRefreshTokenExpires, AccessToken: token}
-		log.Println(res)
 		utils.RespondWithJson(w, http.StatusOK, res)
 	}
 }

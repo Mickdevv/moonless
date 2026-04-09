@@ -7,13 +7,13 @@ import ProductsTableView from '@/views/admin/products/ProductsTableView.vue'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import AddContentLinkView from '@/views/admin/content-links/AddContentLinkView.vue'
-import UpdateEventView from '@/views/admin/events/UpdateEventView.vue'
-import AddEventView from '@/views/admin/events/AddEventView.vue'
-import EventsTableView from '@/views/admin/events/EventsTableView.vue'
 import ContentLinksTableView from '@/views/admin/content-links/ContentLinksTableView.vue'
 import UpdateContentLinkView from '@/views/admin/content-links/UpdateContentLinkView.vue'
 import ContentLinksView from '@/views/ContentLinksView.vue'
-import EventsView from '@/views/EventsView.vue'
+import ContactView from '@/views/ContactView.vue'
+import ScheduleItemsView from '@/views/ScheduleItemsView.vue'
+import ScheduleItemsTableView from '@/views/admin/schedule-items/ScheduleItemsTableView.vue'
+import AddScheduleItemView from '@/views/admin/schedule-items/AddScheduleItemView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,19 +24,19 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue'),
-    },
-    {
-      path: '/content',
-      name: 'content',
+      path: '/discography',
+      name: 'discography',
       component: ContentLinksView,
     },
     {
-      path: '/events',
-      name: 'events',
-      component: EventsView,
+      path: '/schedule-items',
+      name: 'schedule-items',
+      component: ScheduleItemsView,
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: ContactView,
     },
     {
       path: '/shop',
@@ -47,6 +47,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: RegisterView,
+    },
+    {
+      path: '/logout',
+      name: 'logout',
+      component: LoginView,
     },
     {
       path: '/login',
@@ -75,19 +80,19 @@ const router = createRouter({
           props: true,
         },
         {
-          path: 'events',
-          name: 'admin-events',
-          component: EventsTableView, // or AdminProductsView
+          path: 'schedule-items',
+          name: 'admin-schedule-items',
+          component: ScheduleItemsTableView, // or AdminProductsView
         },
         {
-          path: 'events/add',
-          name: 'admin-events-add',
-          component: AddEventView,
+          path: 'schedule-items/add',
+          name: 'admin-schedule-items-add',
+          component: AddScheduleItemView,
         },
         {
-          path: 'events/:id',
-          name: 'admin-events-edit',
-          component: AddEventView,
+          path: 'schedule-items/:id',
+          name: 'admin-schedule-items-edit',
+          component: AddScheduleItemView,
 
           props: true,
         },

@@ -3,7 +3,6 @@ package contentlinks
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
 	"net/http"
 	"path/filepath"
 
@@ -73,8 +72,6 @@ func CreateContentLinkHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 			UpdatedAt:    contentLink.UpdatedAt.Time,
 		}
 
-		log.Println(res, contentLink.Description, params.Description)
-
 		utils.RespondWithJson(w, http.StatusOK, res)
 
 	}
@@ -97,6 +94,7 @@ func GetContentLinkByIdHandler(serverCfg *utils.ServerCfg) http.HandlerFunc {
 		}
 
 		res := ContentLink{
+			Id:           contentLink.ID,
 			Title:        contentLink.Title,
 			Description:  contentLink.Description.String,
 			Platform:     contentLink.Platform,

@@ -6,6 +6,7 @@ import { useAuthStore } from './auth'
 import type { ContentLink } from '@/types/types/content-link'
 import type { CreateContentLinkDTO } from '@/types/DTOs/CreateContentLink.dto'
 import axios from 'axios'
+import { ContentLinkPlatform } from '@/types/enums/content-link-platform.enum'
 
 export const useContentLinksStore = defineStore('content-links', () => {
   const router = useRouter()
@@ -13,7 +14,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
 
   const blankContentLink: ContentLink = {
     id: '',
-    platform: '',
+    platform: ContentLinkPlatform.YOUTUBE,
     title: '',
     description: '',
     url: '',
@@ -47,7 +48,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
       }
 
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
-      const res = await axios.post('/api/content-links', formData, { headers })
+      const res = await axios.post('/api/discography', formData, { headers })
       contentLinks.value.push(res.data)
       toast.add({
         severity: 'success',
@@ -74,8 +75,13 @@ export const useContentLinksStore = defineStore('content-links', () => {
     error.value = null
 
     try {
-      const res = await axios.get(`/api/content-links/${id}`)
-      currentContentLink.value = res.data
+      const res = await axios.get(`/api/discography/${id}`)
+      currentContentLink.value = {
+        ...res.data,
+        published_at: new Date(res.data.published_at),
+        created_at: new Date(res.data.created_at),
+        updated_at: new Date(res.data.updated_at),
+      }
     } catch (err: any) {
       error.value = err
       toast.add({
@@ -94,8 +100,15 @@ export const useContentLinksStore = defineStore('content-links', () => {
     error.value = null
 
     try {
-      const res = await axios.get('/api/content-links')
-      contentLinks.value = res.data
+      const res = await axios.get('/api/discography')
+      contentLinks.value = res.data.map((cl: ContentLink) => {
+        return {
+          ...cl,
+          published_at: new Date(cl.published_at),
+          created_at: new Date(cl.created_at),
+          updated_at: new Date(cl.updated_at),
+        }
+      })
     } catch (err: any) {
       error.value = err
       toast.add({
@@ -120,7 +133,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
     try {
       authStore.ensureToken()
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
-      const res = await axios.delete(`/api/content-links/${id}`, { headers })
+      const res = await axios.delete(`/api/discography/${id}`, { headers })
       contentLinks.value = contentLinks.value.filter((cl) => cl.id != id)
     } catch (err: any) {
       error.value = err

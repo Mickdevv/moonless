@@ -1,7 +1,7 @@
 .env
-static/*
-static/**
-*/static/images
+backend/static/images/events/**
+backend/static/images/products/**
+backend/static/images/schedule-items/**
 docker-compose.yml
 environments
 

@@ -56,7 +56,6 @@ const contactFormSubmit = () => {
   <h2>Contact options</h2>
   <div>
     <form class="contact-form contact-option" @submit="contactFormSubmit()">
-      <h3>Fill out our contact form</h3>
       <div class="field">
         <label>Name</label>
         <InputText required v-model="contactForm.name" class="w-full" />

@@ -43,7 +43,6 @@ const prev = () => {
 
 <template>
   <div class="card">
-
     <Galleria v-model:activeIndex="activeIndex" :value="images" :responsiveOptions="responsiveOptions" :numVisible="5"
       containerStyle="width: 100%" :showThumbnails="false" :showIndicators="true" :circular="true" :autoPlay="true"
       :transitionInterval="5000" :showItemNavigators="true">
@@ -55,9 +54,19 @@ const prev = () => {
       </template>
     </Galleria>
   </div>
+
+  <div class="profiles">
+
+    <h3>Envie de nous voir jouer ? <a>Consultez nos dates</a> par ici !</h3>
+    <h3>Envie de nous booker et/ou contacter ? <a>Contactez nouz</a> par ici !</h3>
+  </div>
 </template>
 
 <style scoped>
+.profiles {
+  margin: 1rem
+}
+
 .carousel-thumbnail {
   max-width: 5rem;
 }

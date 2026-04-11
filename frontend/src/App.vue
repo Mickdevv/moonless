@@ -20,14 +20,19 @@ const items = computed(() => {
     ...(authStore.accessToken ? [
       { label: 'Shop', command: () => router.push({ name: 'shop' }) },
       // { label: 'Add link', command: () => router.push({ name: 'admin-content-links-add' }) },
-      { label: 'Links', command: () => router.push({ name: 'admin-content-links' }) },
-      // { label: 'Add schedule item', command: () => router.push({ name: 'admin-schedule-items-add' }) },
-      { label: 'Events', command: () => router.push({ name: 'admin-schedule-items' }) },
-      // { label: 'Add product', command: () => router.push({ name: 'admin-products-add' }) },
-      { label: 'Products', command: () => router.push({ name: 'admin-products' }) },
+      {
+        label: 'Admin', items: [
+
+          { label: 'Links', command: () => router.push({ name: 'admin-content-links' }) },
+          // { label: 'Add schedule item', command: () => router.push({ name: 'admin-schedule-items-add' }) },
+          { label: 'Events', command: () => router.push({ name: 'admin-schedule-items' }) },
+          // { label: 'Add product', command: () => router.push({ name: 'admin-products-add' }) },
+          { label: 'Products', command: () => router.push({ name: 'admin-products' }) },
+          // { label: 'Login', command: () => router.push({ name: 'login' }) },
+          // { label: 'Register', command: () => router.push({ name: 'register' }) },
+        ]
+      },
       { label: 'Log out', command: () => router.push({ name: 'logout' }) },
-      // { label: 'Login', command: () => router.push({ name: 'login' }) },
-      // { label: 'Register', command: () => router.push({ name: 'register' }) },
     ] : [])
   ])
 });

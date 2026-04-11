@@ -9,6 +9,7 @@ import (
 
 	"github.com/Mickdevv/moonless/backend/api/auth"
 	"github.com/Mickdevv/moonless/backend/api/contentlinks"
+	"github.com/Mickdevv/moonless/backend/api/email"
 	"github.com/Mickdevv/moonless/backend/api/productimages"
 	"github.com/Mickdevv/moonless/backend/api/products"
 	"github.com/Mickdevv/moonless/backend/api/scheduleitems"
@@ -32,9 +33,13 @@ func main() {
 	}
 
 	serverConfig := utils.ServerCfg{
-		JWT_SECRET:       os.Getenv("JWT_SECRET"),
-		DB:               database.New(dbConn),
-		STATIC_FILES_DIR: os.Getenv("STATIC_FILES_DIR"),
+		JWT_SECRET:        os.Getenv("JWT_SECRET"),
+		DB:                database.New(dbConn),
+		STATIC_FILES_DIR:  os.Getenv("STATIC_FILES_DIR"),
+		SMTP_HOST:         os.Getenv("SMTP_HOST"),
+		SMTP_PORT:         os.Getenv("SMTP_PORT"),
+		SMTP_FROM_ADDRESS: os.Getenv("SMTP_FROM_ADDRESS"),
+		SMTP_PASSWORD:     os.Getenv("SMTP_PASSWORD"),
 	}
 
 	mux := http.NewServeMux()
@@ -47,6 +52,7 @@ func main() {
 	productimages.RegisterRoutes(mux, &serverConfig)
 	contentlinks.RegisterRoutes(mux, &serverConfig)
 	scheduleitems.RegisterRoutes(mux, &serverConfig)
+	email.RegisterRoutes(mux, &serverConfig)
 
 	serverPort := os.Getenv("SERVER_PORT")
 	server := &http.Server{

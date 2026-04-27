@@ -12,4 +12,5 @@ type ServerCfg struct {
 	SMTP_PORT         string
 	SMTP_FROM_ADDRESS string
 	SMTP_PASSWORD     string
+	ADMIN_EMAIL       string
 }

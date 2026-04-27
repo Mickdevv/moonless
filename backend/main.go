@@ -40,6 +40,7 @@ func main() {
 		SMTP_PORT:         os.Getenv("SMTP_PORT"),
 		SMTP_FROM_ADDRESS: os.Getenv("SMTP_FROM_ADDRESS"),
 		SMTP_PASSWORD:     os.Getenv("SMTP_PASSWORD"),
+		ADMIN_EMAIL:       os.Getenv("ADMIN_EMAIL"),
 	}
 
 	mux := http.NewServeMux()

@@ -1,30 +1,15 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { useProductStore } from '@/stores/products'
+import { onMounted, ref } from 'vue'
 import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
-import ConfirmPopup from 'primevue/confirmpopup';
-
-
-import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
+import { useToast } from 'primevue/usetoast'
 import 'primeicons/primeicons.css'
-import { ref, nextTick } from 'vue'
-import type { CreateProductImageDto } from '@/types/DTOs/CreateProductImage.dto'
-import { useAuthStore } from '@/stores/auth'
+import axios from 'axios'
 import type { ContactForm } from '@/types/types/contact-form'
 
-
-const route = useRoute()
-const productStore = useProductStore()
-const authStore = useAuthStore()
-
-const confirm = useConfirm();
-const toast = useToast();
+const toast = useToast()
+const loading = ref(false)
 
 onMounted(async () => {
   let tiktokScript = document.createElement('script')
@@ -34,7 +19,6 @@ onMounted(async () => {
   let instagramScript = document.createElement('script')
   instagramScript.setAttribute('src', "//www.instagram.com/embed.js")
   document.head.appendChild(instagramScript)
-
 })
 
 const contactForm = ref<ContactForm>({
@@ -45,17 +29,29 @@ const contactForm = ref<ContactForm>({
   email: ""
 })
 
-const contactFormSubmit = () => {
-  console.log("TODO: Submit contact form")
+const contactFormSubmit = async () => {
+  loading.value = true
+  try {
+    await axios.post('/api/email', {
+      name: contactForm.value.name,
+      email: contactForm.value.email,
+      phone_number: contactForm.value.phoneNumber,
+      reason: contactForm.value.reason,
+      message: contactForm.value.message,
+    })
+    contactForm.value = { name: "", reason: "", phoneNumber: "", message: "", email: "" }
+    toast.add({ severity: 'success', summary: 'Message sent', detail: "We'll be in touch soon!", life: 4000 })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to send message, please try again.', life: 4000 })
+  } finally {
+    loading.value = false
+  }
 }
-
-
 </script>
 
 <template>
-  <h2>Contact options</h2>
   <div>
-    <form class="contact-form contact-option" @submit="contactFormSubmit()">
+    <form class="contact-form contact-option" @submit.prevent="contactFormSubmit()">
       <div class="field">
         <label>Name</label>
         <InputText required v-model="contactForm.name" class="w-full" />
@@ -76,13 +72,12 @@ const contactFormSubmit = () => {
         <label>Message</label>
         <Textarea required v-model="contactForm.message" class="w-full" />
       </div>
+      <Button class="field" type="submit" label="Send message" :loading="loading" />
     </form>
 
     <div class="contact-option">
-
       <h3>Send us an email at <a href="mailto:bandmoonless@gmail.com">bandmoonless@gmail.com</a>
       </h3>
-
     </div>
 
     <div class="contact-option">

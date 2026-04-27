@@ -10,6 +10,8 @@ collections:
     path: "collections/product-images"
   - name: "Auth"
     path: "collections/Auth"
+  - name: "email"
+    path: "collections/email"
 
 specs:
 

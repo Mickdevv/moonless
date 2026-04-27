@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
@@ -10,15 +10,24 @@ import type { ContactForm } from '@/types/types/contact-form'
 
 const toast = useToast()
 const loading = ref(false)
+const embedKey = ref(0)
 
-onMounted(async () => {
-  let tiktokScript = document.createElement('script')
-  tiktokScript.setAttribute('src', 'https://www.tiktok.com/embed.js')
-  document.head.appendChild(tiktokScript)
+const loadTikTokScript = () => {
+  // Remove first so the browser re-fetches and re-executes on each page visit
+  document.querySelector('script[src="https://www.tiktok.com/embed.js"]')?.remove()
+  const script = document.createElement('script')
+  script.src = 'https://www.tiktok.com/embed.js'
+  document.head.appendChild(script)
+}
 
-  let instagramScript = document.createElement('script')
-  instagramScript.setAttribute('src', "//www.instagram.com/embed.js")
-  document.head.appendChild(instagramScript)
+const retryEmbeds = async () => {
+  embedKey.value++
+  await nextTick()
+  loadTikTokScript()
+}
+
+onMounted(() => {
+  loadTikTokScript()
 })
 
 const contactForm = ref<ContactForm>({
@@ -82,15 +91,18 @@ const contactFormSubmit = async () => {
 
     <div class="contact-option">
       <h3>DM us on social media!</h3>
-      <iframe src="https://www.Instagram.com/moonlessoff/embed" width="100%" frameborder="0" scrolling="no"
-        allowtransparency="true" style="border: none; overflow: hidden;" class="instagram-embed">
-      </iframe>
+      <div :key="embedKey">
+        <iframe src="https://www.Instagram.com/moonlessoff/embed" width="100%" frameborder="0" scrolling="no"
+          allowtransparency="true" style="border: none; overflow: hidden;" class="instagram-embed">
+        </iframe>
 
-      <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@moonlessoff" data-unique-id="moonlessoff"
-        data-embed-type="creator">
-        <section> <a target="_blank" href="https://www.tiktok.com/@moonlessoff?refer=creator_embed">@moonlessoff</a>
-        </section>
-      </blockquote>
+        <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@moonlessoff" data-unique-id="moonlessoff"
+          data-embed-type="creator">
+          <section> <a target="_blank" href="https://www.tiktok.com/@moonlessoff?refer=creator_embed">@moonlessoff</a>
+          </section>
+        </blockquote>
+      </div>
+      <Button label="Reload embeds" severity="secondary" size="small" @click="retryEmbeds()" />
     </div>
   </div>
 </template>

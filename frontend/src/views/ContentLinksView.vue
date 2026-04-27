@@ -15,14 +15,14 @@ onMounted(() => {
 <template>
   <h2>Spotify</h2>
   <iframe class="content_link" v-for="spotifyLink in contentLinkStore.contentLinks.filter((cl) =>
-    cl.platform.toLowerCase() == 'spotify')" data-testid="embed-iframe" style="border-radius:12px"
+    cl.platform.toLowerCase() == 'spotify')" :key="spotifyLink.id" data-testid="embed-iframe" style="border-radius:12px"
     :src="spotifyLink.url.replace('/track', '/embed/track')" width="100%" height="352" frameBorder="0"
     allowfullscreen="false" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
     loading="lazy"></iframe>
 
   <h2>Youtube</h2>
   <YouTube class="content_link" v-for="youtubeVideo in contentLinkStore.contentLinks.filter((cl) =>
-    cl.platform.toLowerCase() == 'youtube')" :src="youtubeVideo.url" />
+    cl.platform.toLowerCase() == 'youtube')" :key="youtubeVideo.id" :src="youtubeVideo.url" />
 
 </template>
 

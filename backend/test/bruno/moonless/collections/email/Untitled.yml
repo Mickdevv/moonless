@@ -1,0 +1,28 @@
+info:
+  name: Untitled
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/email
+  params:
+    - name: ""
+      value: ""
+      type: query
+  body:
+    type: json
+    data: |-
+      {
+        "name": "kieran",
+        "email": "kieransirret@gmail.com",
+        "phone_number": "1234567",  "reason": "lol",
+        "message": "lolllllll"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

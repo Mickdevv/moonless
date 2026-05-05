@@ -4,4 +4,4 @@ backend/static/images/products/**
 backend/static/images/schedule-items/**
 docker-compose.yml
 environments
-
+CLAUDE.md

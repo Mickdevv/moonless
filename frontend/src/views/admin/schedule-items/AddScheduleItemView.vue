@@ -88,8 +88,8 @@ const confirmDeleteScheduleItemImage = (event: any, id: string) => {
   });
 };
 
-onMounted(() => {
-  authStore.ensureToken()
+onMounted(async () => {
+  await authStore.ensureToken()
   const id = route.params.id as string
   if (id) {
     scheduleItemStore.getScheduleItemById(id)

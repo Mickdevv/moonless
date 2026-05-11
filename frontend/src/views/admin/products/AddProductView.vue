@@ -68,8 +68,8 @@ const confirm2 = (event: any) => {
   });
 };
 
-onMounted(() => {
-  authStore.ensureToken()
+onMounted(async () => {
+  await authStore.ensureToken()
   productStore.resetCurrentProduct()
 })
 

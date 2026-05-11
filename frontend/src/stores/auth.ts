@@ -1,7 +1,6 @@
 import type { LoginDTO } from '@/types/DTOs/Login.dto'
 import type { RegisterDTO } from '@/types/DTOs/Register.dto'
 import type { JwtPayload } from '@/types/types/JwtPayload'
-import type { User } from '@/types/types/user'
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'
 import { defineStore } from 'pinia'
@@ -18,28 +17,33 @@ export const useAuthStore = defineStore('auth', () => {
   const accessTokenPayload = ref<JwtPayload>()
   const loading = ref<boolean>(false)
   const error = ref<string | null>(null)
+  let refreshInFlight: Promise<boolean> | null = null
 
-  const refresh = async () => {
-    console.log('REFRESH')
+  const refresh = async (): Promise<boolean> => {
+    if (refreshInFlight) return refreshInFlight
+    refreshInFlight = _refresh()
+    try {
+      return await refreshInFlight
+    } finally {
+      refreshInFlight = null
+    }
+  }
+
+  const _refresh = async (): Promise<boolean> => {
     loading.value = true
     error.value = null
     try {
       const res = await axios.get(`/api/refresh/${refreshToken.value}`)
       accessToken.value = res.data.access_token
+      accessTokenPayload.value = jwtDecode<JwtPayload>(accessToken.value!)
       refreshToken.value = res.data.refresh_token
-      refreshTokenExpires.value = res.data.refresh_token_expires
+      refreshTokenExpires.value = new Date(res.data.refresh_token_expires)
       localStorage.setItem('access_token', accessToken.value!)
       localStorage.setItem('refresh_token', refreshToken.value!)
-      localStorage.setItem('refresh_token_expires', refreshTokenExpires.value!.toISOString())
-
-      console.warn(res)
-      console.log(accessToken.value, refreshToken.value, refreshTokenExpires.value)
-
+      localStorage.setItem('refresh_token_expires', refreshTokenExpires.value.toISOString())
       return true
     } catch (err: any) {
       error.value = err
-      console.error('Error when refreshing token')
-      console.error(err)
       await logout()
       return false
     } finally {
@@ -57,14 +61,12 @@ export const useAuthStore = defineStore('auth', () => {
       refreshToken.value = res.data.refresh_token
       refreshTokenExpires.value = new Date(res.data.refresh_token_expires)
 
-      console.log(res.data)
-
       if (accessToken.value) {
         accessTokenPayload.value = jwtDecode<JwtPayload>(accessToken.value)
         localStorage.setItem('access_token', accessToken.value)
       }
       if (refreshTokenExpires.value) {
-        localStorage.setItem('refresh_token_expires', String(refreshTokenExpires.value))
+        localStorage.setItem('refresh_token_expires', refreshTokenExpires.value.toISOString())
       }
       if (refreshToken.value) {
         localStorage.setItem('refresh_token', refreshToken.value)
@@ -96,7 +98,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const res = await axios.post('/api/register', registerDetails)
+      await axios.post('/api/register', registerDetails)
       router.push('/login')
       toast.add({
         severity: 'success',
@@ -118,7 +120,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    console.log('LOGOUT')
     refreshToken.value = undefined
     accessToken.value = undefined
     accessTokenPayload.value = undefined
@@ -126,6 +127,12 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('refresh_token')
     localStorage.removeItem('refresh_token_expires')
     await router.push(`/login`)
+  }
+
+  const isExpiredDate = (time: Date | undefined) => {
+    if (!time) return true
+    const date = time instanceof Date ? time : new Date(time)
+    return date.getTime() < Date.now()
   }
 
   const ensureToken = async (attempts = 0, redirect = true): Promise<boolean> => {
@@ -136,30 +143,24 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
 
-    const isAccessExpired = accessTokenPayload.value
-      ? accessTokenPayload.value.exp * 1000 < Date.now()
-      : false
+    const isAccessExpired =
+      !accessTokenPayload.value || accessTokenPayload.value.exp * 1000 < Date.now()
     const isRefreshExpired = isExpiredDate(refreshTokenExpires.value)
 
     if (isAccessExpired) {
-      console.log('Access expired')
       if (refreshToken.value && !isRefreshExpired) {
         if (attempts > 2) {
           if (redirect) {
             await logout()
           }
-          console.log('Attempt count exceeded: ' + attempts)
           return false
         }
         if (await refresh()) {
-          console.log('REFRESH SUCCESSFUL')
           return true
         }
-        // TODO: Could be dangerous to have a recursive call like this
-        attempts += 1
-        return await ensureToken(attempts)
+        // refresh() already called logout() on failure
+        return false
       } else {
-        console.log('Catch-all from refresh ', refreshToken.value, isRefreshExpired)
         if (redirect) {
           await logout()
         }
@@ -184,17 +185,7 @@ export const useAuthStore = defineStore('auth', () => {
     refreshTokenExpires.value = new Date(refreshTokenExpiresFromLocalStorage)
   }
 
-  const isExpiredUnix = (time: number | undefined) => {
-    return !time || time * 1000 < Date.now()
-  }
-  const isExpiredDate = (time: Date | undefined) => {
-    if (!time) return true
-
-    const date = time instanceof Date ? time : new Date(time)
-    return date.getTime() < Date.now()
-  }
-
-  if (refreshToken.value && isExpiredDate(refreshTokenExpires.value)) {
+  if (refreshToken.value && !isExpiredDate(refreshTokenExpires.value)) {
     ensureToken()
   }
 

@@ -197,10 +197,9 @@ export const useProductStore = defineStore('products', () => {
     try {
       loading.value = true
 
-      authStore.ensureToken()
+      await authStore.ensureToken()
 
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
-      authStore.ensureToken()
       const res = await axios.post('/api/products', currentProduct.value, { headers })
       products.value.push(res.data.product_images)
 

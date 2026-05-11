@@ -71,8 +71,8 @@ const confirmUpdate = (event: any) => {
 };
 
 
-onMounted(() => {
-  authStore.ensureToken()
+onMounted(async () => {
+  await authStore.ensureToken()
   const id = route.params.id as string
   if (id) {
     contentLinkStore.getContentLinkById(id)

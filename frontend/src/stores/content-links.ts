@@ -131,7 +131,7 @@ export const useContentLinksStore = defineStore('content-links', () => {
     error.value = null
 
     try {
-      authStore.ensureToken()
+      await authStore.ensureToken()
       const headers = { Authorization: `Bearer ${authStore.accessToken}` }
       const res = await axios.delete(`/api/discography/${id}`, { headers })
       contentLinks.value = contentLinks.value.filter((cl) => cl.id != id)

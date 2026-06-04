@@ -1,29 +1,63 @@
 @import './base.css';
 
+/* Prevent horizontal scroll from oversized elements */
+html, body {
+  overflow-x: hidden;
+}
+
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
   font-weight: normal;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
 }
 
-a,
-.green {
+a {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+  color: var(--band-yellow);
+  transition: color 0.3s;
 }
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+a:hover {
+  color: var(--band-yellow-dark);
 }
-
 
 .table-add-button {
   margin: 5px;
+}
+
+/* ── Shared section header ── */
+.section-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.section-title {
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  color: var(--band-white);
+}
+
+.title-accent {
+  width: 60px;
+  height: 4px;
+  background: var(--band-yellow);
+  margin: 0.75rem auto 0;
+}
+
+/* Tablet — tighten letter-spacing so long words don't overflow */
+@media (max-width: 768px) {
+  .section-title {
+    letter-spacing: 0.15em;
+  }
+}
+
+/* Mobile — smaller size + minimal spacing */
+@media (max-width: 480px) {
+  .section-title {
+    font-size: clamp(1.6rem, 8vw, 2rem);
+    letter-spacing: 0.08em;
+  }
+  .section-header {
+    margin-bottom: 2rem;
+  }
 }
